@@ -1,0 +1,195 @@
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.secret
+*.pem
+*.key
+*.pub
+secrets.json
+credentials.json
+.secrets/
+secrets/
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build & Dist Folders
+dist/
+build/
+out/
+coverage/
+.nuxt/
+.cache/
+.next/
+.output/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# IDE & Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.sublime-project
+.sublime-workspace
+*.iml
+.project
+.classpath
+.c9/
+*.sublime-workspace
+.history
+.ionide
+.vim
+vim.rc
+.emacs
+.vimrc
+
+# OS Specific
+.DS_Store
+Thumbs.db
+.directory
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.com.apple.timemachine.MachineDescription.plist
+desktop.ini
+ehthumbs.db
+
+# Temporary Files
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+.#*
+tmp/
+temp/
+logs/
+*.log
+
+# IDE Generated Files
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# Package Managers
+npm-debug.log
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+Gemfile.lock
+
+# Database Files
+*.sqlite
+*.sqlite3
+*.db
+*.mdb
+
+# Local Testing & Development
+.mocha_output
+test/temp/
+.nyc_output/
+
+# AWS, Azure & Cloud
+.aws/
+.azure/
+azure-pipelines.yml
+*.pem
+connection_string.txt
+connectionstring.txt
+
+# API Keys & Tokens
+.apikey
+apikey.txt
+.token
+token.txt
+.bearer
+bearer.txt
+oauth.json
+.oauth
+.auth
+.cookie
+
+# Credentials & Sensitive Data
+credentials/
+.credentials
+*.key
+*.cert
+*.crt
+*.p8
+*.p12
+.ssh/
+authorized_keys
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Miscellaneous
+node_modules
+.env
+.DS_Store
+.vscode-test/
+.vscodetest/
+dist/
+*.tgz
+
+# IDE & Executables
+.exe
+.dll
+
+# Never commit these patterns
+**/*password*
+**/*secret*
+**/*token*
+**/*credential*
+**/*api*key*
+**/*private*key*
+**/*access*key*
