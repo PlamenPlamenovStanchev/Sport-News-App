@@ -14,6 +14,7 @@ export default defineConfig({
         // Clean-URL pages (folder/index.html → served at /folder/)
         login: resolve(__dirname, "login/index.html"),
         profile: resolve(__dirname, "profile/index.html"),
+        authCallback: resolve(__dirname, "auth/callback/index.html"),
 
         // Sub-pages (legacy /pages/ paths kept for internal links)
         newsDetails: resolve(__dirname, "pages/news-details.html"),

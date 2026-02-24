@@ -1,14 +1,6 @@
 // src/pages/login-page.js
 // ------------------------
-// Handles both the Login and Register forms on /login/index.html.
-//
-// Behaviour:
-//   · Already logged-in users are redirected to /profile immediately.
-//   · Successful LOGIN  → redirect to /profile
-//   · Successful REGISTER → if email confirmation is OFF (magic dev mode), go
-//     to /profile; otherwise show a success banner telling the user to check
-//     their inbox.
-//   · Tab can be opened pre-selected via ?tab=register in the URL.
+// Handles Login, Register, and Google OAuth on /login/index.html.
 
 import { supabase } from "../services/supabaseClient.js";
 import { getCurrentUser } from "../utils/auth.js";
@@ -38,6 +30,37 @@ document.getElementById("switchToLogin").addEventListener("click", () => {
   bootstrap.Tab.getOrCreateInstance(document.getElementById("login-tab")).show();
 });
 
+// ─── Google OAuth ─────────────────────────────────────────────────────────────
+// Both the Login and Register panels share the same OAuth flow.
+// Supabase creates a new account on first sign-in, or logs in an existing one.
+// After Google redirects back, /auth/callback/ exchanges the code for a session
+// and then sends the user to /profile/.
+
+async function signInWithGoogle() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      // Supabase redirects here after Google grants access.
+      // The callback page exchanges the auth code for a real session.
+      redirectTo: `${window.location.origin}/auth/callback/`,
+    },
+  });
+
+  if (error) {
+    // Surface the error in whichever panel is visible
+    const activeError =
+      document.getElementById("loginPanel").classList.contains("show")
+        ? document.getElementById("loginError")
+        : document.getElementById("registerError");
+
+    activeError.textContent = error.message;
+    activeError.classList.remove("d-none");
+  }
+}
+
+document.getElementById("googleLoginBtn").addEventListener("click", signInWithGoogle);
+document.getElementById("googleRegisterBtn").addEventListener("click", signInWithGoogle);
+
 // ─── Login Form ───────────────────────────────────────────────────────────────
 
 const loginForm  = document.getElementById("loginForm");
@@ -50,12 +73,12 @@ loginForm.addEventListener("submit", async (e) => {
   const email    = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value;
 
-  setLoading(loginBtn, true);
+  setLoading(loginBtn, true, "Login");
   loginError.classList.add("d-none");
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-  setLoading(loginBtn, false);
+  setLoading(loginBtn, false, "Login");
 
   if (error) {
     loginError.textContent = error.message;
@@ -63,7 +86,6 @@ loginForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  // ✓ Login successful → go to Profile
   window.location.href = "/profile/";
 });
 
@@ -87,21 +109,19 @@ registerForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  setLoading(registerBtn, true);
+  setLoading(registerBtn, true, "Create Account");
   registerError.classList.add("d-none");
   registerSuccess.classList.add("d-none");
 
-  // 1. Create auth account
   const { data, error } = await supabase.auth.signUp({ email, password });
 
   if (error) {
-    setLoading(registerBtn, false);
+    setLoading(registerBtn, false, "Create Account");
     registerError.textContent = error.message;
     registerError.classList.remove("d-none");
     return;
   }
 
-  // 2. Insert profile row (only if user is returned and confirmed immediately)
   if (data.user) {
     const { error: profileError } = await supabase.from("profiles").insert([
       { id: data.user.id, username, role: "user" },
@@ -111,9 +131,8 @@ registerForm.addEventListener("submit", async (e) => {
     }
   }
 
-  setLoading(registerBtn, false);
+  setLoading(registerBtn, false, "Create Account");
 
-  // 3a. Email confirmation required → show success banner
   if (data.session === null) {
     registerSuccess.innerHTML =
       "Account created! <strong>Check your inbox</strong> to confirm your email, then log in.";
@@ -122,20 +141,14 @@ registerForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  // 3b. Auto-confirm enabled (dev / "Confirm email" disabled in Supabase)
   window.location.href = "/profile/";
 });
 
-// ─── Helper: disable button + show spinner while async work runs ──────────────
+// ─── Helper ───────────────────────────────────────────────────────────────────
 
-function setLoading(btn, loading) {
+function setLoading(btn, loading, label) {
   btn.disabled = loading;
   btn.innerHTML = loading
     ? `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Please wait…`
-    : btn.dataset.label || btn.textContent;
-
-  // Persist original label so we can restore it
-  if (!loading && !btn.dataset.label) {
-    btn.dataset.label = btn.textContent;
-  }
+    : label;
 }
