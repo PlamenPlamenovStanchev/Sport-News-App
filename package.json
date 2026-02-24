@@ -1,0 +1,16 @@
+{
+  "name": "sport-news-app",
+  "version": "1.0.0",
+  "description": "Multi-page Sport News Application built with Vite and Supabase",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1"
+  },
+  "devDependencies": {
+    "vite": "^6.2.0"
+  }
+}
