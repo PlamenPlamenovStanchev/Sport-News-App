@@ -19,4 +19,13 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 }
 
 // Singleton — import this wherever you need Supabase access.
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    // Automatically exchange the ?code= or #access_token= in the URL
+    // for a real session on any page load. Required for OAuth callbacks.
+    detectSessionInUrl: true,
+    // PKCE is the secure default. Supabase may still return implicit-flow
+    // tokens via hash; detectSessionInUrl handles both cases.
+    flowType: "pkce",
+  },
+});
