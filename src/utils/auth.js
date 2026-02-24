@@ -40,7 +40,7 @@ export async function getCurrentProfile() {
 export async function requireAuth() {
   const user = await getCurrentUser();
   if (!user) {
-    window.location.href = "/pages/login.html";
+    window.location.href = "/login/";
   }
   return user;
 }

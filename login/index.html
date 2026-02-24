@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | The Sport News App</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="/src/styles/main.css" />
+  </head>
+  <body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="/index.html">SportNews</a>
+        <div class="ms-auto" id="navAuthLinks">
+          <!-- Populated by login-page.js -->
+        </div>
+      </div>
+    </nav>
+
+    <!-- Card -->
+    <main
+      class="container d-flex justify-content-center align-items-center"
+      style="min-height: 85vh;"
+    >
+      <div class="card shadow-sm" style="width: 100%; max-width: 460px;">
+        <!-- Tab headers -->
+        <div class="card-header p-0">
+          <ul class="nav nav-tabs card-header-tabs" id="authTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active px-4 py-3"
+                id="login-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#loginPanel"
+                type="button"
+                role="tab"
+              >
+                Login
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link px-4 py-3"
+                id="register-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#registerPanel"
+                type="button"
+                role="tab"
+              >
+                Register
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-body p-4">
+          <div class="tab-content">
+
+            <!-- ── Login Panel ──────────────────────────────────── -->
+            <div
+              class="tab-pane fade show active"
+              id="loginPanel"
+              role="tabpanel"
+            >
+              <h5 class="mb-4 fw-semibold">Welcome back</h5>
+
+              <div id="loginError" class="alert alert-danger d-none" role="alert"></div>
+
+              <form id="loginForm" novalidate>
+                <div class="mb-3">
+                  <label for="loginEmail" class="form-label">Email address</label>
+                  <input
+                    type="email"
+                    id="loginEmail"
+                    class="form-control"
+                    placeholder="you@example.com"
+                    required
+                    autocomplete="email"
+                  />
+                </div>
+                <div class="mb-4">
+                  <label for="loginPassword" class="form-label">Password</label>
+                  <input
+                    type="password"
+                    id="loginPassword"
+                    class="form-control"
+                    placeholder="••••••••"
+                    required
+                    autocomplete="current-password"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  id="loginBtn"
+                  class="btn btn-dark w-100"
+                >
+                  Login
+                </button>
+              </form>
+
+              <p class="text-center text-muted small mt-3 mb-0">
+                Don't have an account?
+                <button
+                  class="btn btn-link btn-sm p-0 align-baseline"
+                  id="switchToRegister"
+                >Register here</button>
+              </p>
+            </div>
+
+            <!-- ── Register Panel ──────────────────────────────── -->
+            <div
+              class="tab-pane fade"
+              id="registerPanel"
+              role="tabpanel"
+            >
+              <h5 class="mb-4 fw-semibold">Create account</h5>
+
+              <div id="registerError"   class="alert alert-danger  d-none" role="alert"></div>
+              <div id="registerSuccess" class="alert alert-success d-none" role="alert"></div>
+
+              <form id="registerForm" novalidate>
+                <div class="mb-3">
+                  <label for="regUsername" class="form-label">Username</label>
+                  <input
+                    type="text"
+                    id="regUsername"
+                    class="form-control"
+                    placeholder="johndoe"
+                    required
+                    autocomplete="username"
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="regEmail" class="form-label">Email address</label>
+                  <input
+                    type="email"
+                    id="regEmail"
+                    class="form-control"
+                    placeholder="you@example.com"
+                    required
+                    autocomplete="email"
+                  />
+                </div>
+                <div class="mb-4">
+                  <label for="regPassword" class="form-label">Password</label>
+                  <input
+                    type="password"
+                    id="regPassword"
+                    class="form-control"
+                    placeholder="Min. 6 characters"
+                    required
+                    minlength="6"
+                    autocomplete="new-password"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  id="registerBtn"
+                  class="btn btn-dark w-100"
+                >
+                  Create Account
+                </button>
+              </form>
+
+              <p class="text-center text-muted small mt-3 mb-0">
+                Already have an account?
+                <button
+                  class="btn btn-link btn-sm p-0 align-baseline"
+                  id="switchToLogin"
+                >Login here</button>
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    ></script>
+    <script type="module" src="/src/pages/login-page.js"></script>
+  </body>
+</html>

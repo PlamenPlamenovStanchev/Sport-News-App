@@ -11,11 +11,12 @@ export default defineConfig({
         // Root page
         home: resolve(__dirname, "index.html"),
 
-        // Sub-pages
-        login: resolve(__dirname, "pages/login.html"),
-        register: resolve(__dirname, "pages/register.html"),
+        // Clean-URL pages (folder/index.html → served at /folder/)
+        login: resolve(__dirname, "login/index.html"),
+        profile: resolve(__dirname, "profile/index.html"),
+
+        // Sub-pages (legacy /pages/ paths kept for internal links)
         newsDetails: resolve(__dirname, "pages/news-details.html"),
-        profile: resolve(__dirname, "pages/profile.html"),
         admin: resolve(__dirname, "pages/admin.html"),
         createNews: resolve(__dirname, "pages/create-news.html"),
         editNews: resolve(__dirname, "pages/edit-news.html"),

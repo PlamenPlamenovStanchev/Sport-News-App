@@ -6,8 +6,17 @@
 
 import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = "https://your-project-id.supabase.co";
-const SUPABASE_ANON_KEY = "your-anon-key-here";
+// Values come from the .env file at the project root (never hardcoded).
+// Vite exposes only variables prefixed with VITE_ to client-side code.
+const SUPABASE_URL      = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  throw new Error(
+    "Supabase credentials are missing. " +
+    "Copy .env.example to .env and fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY."
+  );
+}
 
 // Singleton — import this wherever you need Supabase access.
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

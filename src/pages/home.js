@@ -8,6 +8,7 @@
 //   - Handle pagination
 
 import { fetchApprovedNews } from "../services/newsService.js";
+import { initNavbar } from "../utils/navbar.js";
 
 // ─── State ───────────────────────────────────────────────────────────────────
 
@@ -27,6 +28,7 @@ const tagButtons = document.querySelectorAll("#tagFilters button[data-tag]");
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
+initNavbar();
 loadNews();
 
 // ─── Event Listeners ──────────────────────────────────────────────────────────
