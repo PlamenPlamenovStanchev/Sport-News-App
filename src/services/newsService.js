@@ -8,28 +8,29 @@ import { supabase } from "./supabaseClient.js";
 // ─── READ ────────────────────────────────────────────────────────────────────
 
 /**
- * Fetch a paginated list of approved news articles.
+ * Fetch a paginated list of approved (published) news articles.
  *
  * @param {object} options
- * @param {number} options.page     - Current page (1-based).
- * @param {number} options.limit    - Items per page.
- * @param {string} options.tag      - Sport tag filter ("all" to skip).
- * @param {string} options.search  - Title search term (empty to skip).
+ * @param {number} options.page       - Current page (1-based).
+ * @param {number} options.limit      - Items per page.
+ * @param {string} options.category   - Category name filter ("all" to skip).
+ * @param {string} options.search     - Title search term (empty to skip).
  * @returns {Promise<{ data: object[], count: number, error: object|null }>}
  */
-export async function fetchApprovedNews({ page = 1, limit = 6, tag = "all", search = "" } = {}) {
+export async function fetchApprovedNews({ page = 1, limit = 6, category = "all", search = "" } = {}) {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
   let query = supabase
-    .from("news")
-    .select("id, title, image_url, sport_tag, created_at, author_id", { count: "exact" })
-    .eq("status", "approved")
+    .from("news_articles")
+    .select("id, title, image_url, category_id, created_at, author_id, categories(name)", { count: "exact" })
+    .eq("is_published", true)
     .order("created_at", { ascending: false })
     .range(from, to);
 
-  if (tag && tag !== "all") {
-    query = query.eq("sport_tag", tag);
+  if (category && category !== "all") {
+    // Filter by category name via the join
+    query = query.eq("categories.name", category);
   }
 
   if (search.trim()) {
@@ -41,6 +42,36 @@ export async function fetchApprovedNews({ page = 1, limit = 6, tag = "all", sear
 }
 
 /**
+ * Fetch all categories from the categories table.
+ *
+ * @returns {Promise<{ data: object[]|null, error: object|null }>}
+ */
+export async function fetchCategories() {
+  const { data, error } = await supabase
+    .from("categories")
+    .select("id, name")
+    .order("name");
+
+  return { data, error };
+}
+
+/**
+ * Fetch all articles belonging to a specific author (any status).
+ *
+ * @param {string} authorId - UUID of the author.
+ * @returns {Promise<{ data: object[]|null, error: object|null }>}
+ */
+export async function fetchMyArticles(authorId) {
+  const { data, error } = await supabase
+    .from("news_articles")
+    .select("id, title, image_url, is_published, created_at, categories(name)")
+    .eq("author_id", authorId)
+    .order("created_at", { ascending: false });
+
+  return { data, error };
+}
+
+/**
  * Fetch a single news article by ID.
  *
  * @param {string} id - UUID of the news article.
@@ -48,8 +79,8 @@ export async function fetchApprovedNews({ page = 1, limit = 6, tag = "all", sear
  */
 export async function fetchNewsById(id) {
   const { data, error } = await supabase
-    .from("news")
-    .select("*")
+    .from("news_articles")
+    .select("*, categories(name)")
     .eq("id", id)
     .single();
 
@@ -59,16 +90,39 @@ export async function fetchNewsById(id) {
 // ─── CREATE ───────────────────────────────────────────────────────────────────
 
 /**
- * Create a new news article.
- * Status is always set to "pending" — editors must approve it.
+ * Upload an image to the article-images bucket and return its public URL.
  *
- * @param {{ title: string, content: string, image_url: string, sport_tag: string, author_id: string }} article
+ * @param {File} file - The image file to upload.
+ * @returns {Promise<{ url: string|null, error: object|null }>}
+ */
+export async function uploadArticleImage(file) {
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${crypto.randomUUID()}.${fileExt}`;
+
+  const { error } = await supabase.storage
+    .from("article-images")
+    .upload(fileName, file);
+
+  if (error) return { url: null, error };
+
+  const { data: urlData } = supabase.storage
+    .from("article-images")
+    .getPublicUrl(fileName);
+
+  return { url: urlData.publicUrl, error: null };
+}
+
+/**
+ * Create a new news article.
+ * is_published defaults to FALSE — editors must approve it.
+ *
+ * @param {{ title: string, content: string, image_url: string|null, category_id: string, author_id: string }} article
  * @returns {Promise<{ data: object|null, error: object|null }>}
  */
 export async function createNews(article) {
   const { data, error } = await supabase
-    .from("news")
-    .insert([{ ...article, status: "pending" }])
+    .from("news_articles")
+    .insert([{ ...article, is_published: false }])
     .select()
     .single();
 
@@ -86,7 +140,7 @@ export async function createNews(article) {
  */
 export async function updateNews(id, fields) {
   const { data, error } = await supabase
-    .from("news")
+    .from("news_articles")
     .update(fields)
     .eq("id", id)
     .select()
@@ -104,20 +158,36 @@ export async function updateNews(id, fields) {
  * @returns {Promise<{ error: object|null }>}
  */
 export async function deleteNews(id) {
-  const { error } = await supabase.from("news").delete().eq("id", id);
+  const { error } = await supabase.from("news_articles").delete().eq("id", id);
   return { error };
 }
 
 // ─── STATUS (EDITOR ACTIONS) ──────────────────────────────────────────────────
 
 /**
- * Approve or reject a news article.
+ * Approve a news article (set is_published = true).
  *
- * @param {string} id     - UUID of the article.
- * @param {"approved"|"rejected"} status
+ * @param {string} id - UUID of the article.
  * @returns {Promise<{ error: object|null }>}
  */
-export async function setNewsStatus(id, status) {
-  const { error } = await supabase.from("news").update({ status }).eq("id", id);
+export async function approveArticle(id) {
+  const { error } = await supabase
+    .from("news_articles")
+    .update({ is_published: true })
+    .eq("id", id);
+  return { error };
+}
+
+/**
+ * Reject / unpublish a news article (set is_published = false).
+ *
+ * @param {string} id - UUID of the article.
+ * @returns {Promise<{ error: object|null }>}
+ */
+export async function rejectArticle(id) {
+  const { error } = await supabase
+    .from("news_articles")
+    .update({ is_published: false })
+    .eq("id", id);
   return { error };
 }

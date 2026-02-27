@@ -7,7 +7,7 @@
 //   - Handle title search
 //   - Handle pagination
 
-import { fetchApprovedNews } from "../services/newsService.js";
+import { fetchApprovedNews, fetchCategories } from "../services/newsService.js";
 import { initNavbar } from "../utils/navbar.js";
 
 // ─── State ───────────────────────────────────────────────────────────────────
@@ -15,20 +15,21 @@ import { initNavbar } from "../utils/navbar.js";
 const state = {
   currentPage: 1,
   limit: 6,
-  selectedTag: "all",
+  selectedCategory: "all",
   searchQuery: "",
 };
 
 // ─── DOM References ───────────────────────────────────────────────────────────
 
-const newsGrid = document.getElementById("newsGrid");
-const pagination = document.getElementById("pagination");
-const searchInput = document.getElementById("searchInput");
-const tagButtons = document.querySelectorAll("#tagFilters button[data-tag]");
+const newsGrid       = document.getElementById("newsGrid");
+const pagination     = document.getElementById("pagination");
+const searchInput    = document.getElementById("searchInput");
+const categoryFilters = document.getElementById("categoryFilters");
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
 initNavbar();
+await loadCategories();
 loadNews();
 
 // ─── Event Listeners ──────────────────────────────────────────────────────────
@@ -44,22 +45,36 @@ searchInput.addEventListener("input", () => {
   }, 400);
 });
 
-// Tag filter buttons
-tagButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    // Toggle active style
-    tagButtons.forEach((b) => {
-      b.classList.remove("btn-dark", "active");
-      b.classList.add("btn-outline-dark");
-    });
-    btn.classList.remove("btn-outline-dark");
-    btn.classList.add("btn-dark", "active");
+/**
+ * Fetch categories from DB and render filter buttons dynamically.
+ */
+async function loadCategories() {
+  const { data: categories } = await fetchCategories();
+  if (!categories) return;
 
-    state.selectedTag = btn.dataset.tag;
-    state.currentPage = 1;
-    loadNews();
+  const allBtn = `<button class="btn btn-dark btn-sm active" data-category="all">All</button>`;
+  const catBtns = categories
+    .map((c) => `<button class="btn btn-outline-dark btn-sm" data-category="${escapeHtml(c.name)}">${escapeHtml(c.name)}</button>`)
+    .join("");
+
+  categoryFilters.innerHTML = allBtn + catBtns;
+
+  // Attach click handlers
+  categoryFilters.querySelectorAll("button[data-category]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      categoryFilters.querySelectorAll("button").forEach((b) => {
+        b.classList.remove("btn-dark", "active");
+        b.classList.add("btn-outline-dark");
+      });
+      btn.classList.remove("btn-outline-dark");
+      btn.classList.add("btn-dark", "active");
+
+      state.selectedCategory = btn.dataset.category;
+      state.currentPage = 1;
+      loadNews();
+    });
   });
-});
+}
 
 // ─── Core Functions ───────────────────────────────────────────────────────────
 
@@ -73,7 +88,7 @@ async function loadNews() {
   const { data: articles, count, error } = await fetchApprovedNews({
     page: state.currentPage,
     limit: state.limit,
-    tag: state.selectedTag,
+    category: state.selectedCategory,
     search: state.searchQuery,
   });
 
@@ -110,7 +125,7 @@ function renderNewsCards(articles) {
               style="height: 200px; object-fit: cover;"
             />
             <div class="card-body d-flex flex-column">
-              <span class="badge bg-secondary mb-2">${article.sport_tag}</span>
+              <span class="badge bg-secondary mb-2">${escapeHtml(article.categories?.name ?? "")}</span>
               <h5 class="card-title">${escapeHtml(article.title)}</h5>
               <p class="text-muted small mt-auto">${formatDate(article.created_at)}</p>
               <a

@@ -17,6 +17,7 @@ export async function getCurrentUser() {
 
 /**
  * Get the profile row for the current user (includes role, username).
+ * Joins user_roles to pull the role alongside profile data.
  *
  * @returns {Promise<{ profile: object|null, error: object|null }>}
  */
@@ -24,13 +25,30 @@ export async function getCurrentProfile() {
   const user = await getCurrentUser();
   if (!user) return { profile: null, error: null };
 
-  const { data: profile, error } = await supabase
+  // Fetch profile (may not exist yet)
+  const { data: profile } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
     .single();
 
-  return { profile, error };
+  // Fetch role from user_roles (separate table)
+  const { data: roleRow } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", user.id)
+    .single();
+
+  return {
+    profile: {
+      id: user.id,
+      username: profile?.username ?? user.email.split("@")[0],
+      avatar_url: profile?.avatar_url ?? null,
+      created_at: profile?.created_at ?? null,
+      role: roleRow?.role ?? "user",
+    },
+    error: null,
+  };
 }
 
 /**

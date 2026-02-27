@@ -58,11 +58,29 @@
             <p class="text-muted mb-1" id="profileEmail">—</p>
             <span class="badge bg-secondary" id="profileRole">—</span>
           </div>
-          <div class="ms-auto">
+          <div class="ms-auto d-flex gap-2">
+            <!-- Visible only to authors (toggled by profile.js) -->
+            <button
+              id="addNewsBtn"
+              class="btn btn-success d-none"
+              data-bs-toggle="modal"
+              data-bs-target="#createNewsModal"
+            >
+              + Add News
+            </button>
             <button id="logoutBtn" class="btn btn-outline-dark">
               Logout
             </button>
           </div>
+        </div>
+
+        <hr class="mb-5" />
+
+        <!-- My Articles (visible only for authors/admins — toggled by profile.js) -->
+        <div id="myArticlesSection" class="d-none mb-5">
+          <h4 class="mb-3">My Articles</h4>
+          <div id="myArticlesList"></div>
+          <p id="noArticles" class="text-muted d-none">You haven't written any articles yet.</p>
         </div>
 
         <hr class="mb-5" />
@@ -76,6 +94,51 @@
       </div>
 
     </main>
+
+    <!-- ═══ Create News Modal ═══ -->
+    <div class="modal fade" id="createNewsModal" tabindex="-1" aria-labelledby="createNewsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="createNewsModalLabel">Create News Article</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="modalError" class="alert alert-danger d-none"></div>
+            <div id="modalSuccess" class="alert alert-success d-none"></div>
+
+            <form id="createNewsForm">
+              <div class="mb-3">
+                <label for="newsTitle" class="form-label">Title <span class="text-danger">*</span></label>
+                <input type="text" id="newsTitle" class="form-control" placeholder="Article title" required />
+              </div>
+
+              <div class="mb-3">
+                <label for="newsCategory" class="form-label">Category <span class="text-danger">*</span></label>
+                <select id="newsCategory" class="form-select" required>
+                  <option value="">Select a category...</option>
+                  <!-- Populated by profile.js from categories table -->
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="newsImage" class="form-label">Image <span class="text-danger">*</span></label>
+                <input type="file" id="newsImage" class="form-control" accept="image/*" required />
+              </div>
+
+              <div class="mb-3">
+                <label for="newsContent" class="form-label">Content <span class="text-danger">*</span></label>
+                <textarea id="newsContent" class="form-control" rows="8" placeholder="Write your article here..." required></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-dark w-100" id="submitNewsBtn">
+                Submit for Approval
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <footer class="bg-dark text-white text-center py-3 mt-auto">
       <p class="mb-0">&copy; 2026 Sport News App. All rights reserved.</p>

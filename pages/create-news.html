@@ -30,19 +30,15 @@
           <input type="text" id="title" class="form-control" placeholder="Article title" required />
         </div>
         <div class="mb-3">
-          <label for="sportTag" class="form-label">Sport Tag</label>
-          <select id="sportTag" class="form-select" required>
-            <option value="">Select a sport...</option>
-            <option value="football">Football</option>
-            <option value="basketball">Basketball</option>
-            <option value="tennis">Tennis</option>
-            <option value="swimming">Swimming</option>
-            <option value="athletics">Athletics</option>
+          <label for="newsCategory" class="form-label">Category</label>
+          <select id="newsCategory" class="form-select" required>
+            <option value="">Select a category...</option>
+            <!-- Populated dynamically from categories table -->
           </select>
         </div>
         <div class="mb-3">
-          <label for="imageUrl" class="form-label">Image URL</label>
-          <input type="url" id="imageUrl" class="form-control" placeholder="https://example.com/image.jpg" />
+          <label for="newsImage" class="form-label">Image</label>
+          <input type="file" id="newsImage" class="form-control" accept="image/*" required />
         </div>
         <div class="mb-3">
           <label for="content" class="form-label">Content</label>
