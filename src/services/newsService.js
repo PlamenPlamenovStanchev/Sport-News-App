@@ -72,6 +72,21 @@ export async function fetchMyArticles(authorId) {
 }
 
 /**
+ * Fetch all pending (unpublished) articles for editor moderation.
+ *
+ * @returns {Promise<{ data: object[]|null, error: object|null }>}
+ */
+export async function fetchPendingArticles() {
+  const { data, error } = await supabase
+    .from("news_articles")
+    .select("id, title, content, image_url, is_published, created_at, author_id, categories(name)")
+    .eq("is_published", false)
+    .order("created_at", { ascending: false });
+
+  return { data, error };
+}
+
+/**
  * Fetch a single news article by ID.
  *
  * @param {string} id - UUID of the news article.

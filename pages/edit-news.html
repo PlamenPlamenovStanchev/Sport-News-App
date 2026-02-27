@@ -31,19 +31,17 @@
           <input type="text" id="title" class="form-control" required />
         </div>
         <div class="mb-3">
-          <label for="sportTag" class="form-label">Sport Tag</label>
-          <select id="sportTag" class="form-select" required>
-            <option value="">Select a sport...</option>
-            <option value="football">Football</option>
-            <option value="basketball">Basketball</option>
-            <option value="tennis">Tennis</option>
-            <option value="swimming">Swimming</option>
-            <option value="athletics">Athletics</option>
+          <label for="editCategory" class="form-label">Category</label>
+          <select id="editCategory" class="form-select" required>
+            <option value="">Select a category...</option>
+            <!-- Populated dynamically from categories table -->
           </select>
         </div>
-        <div class="mb-3">
-          <label for="imageUrl" class="form-label">Image URL</label>
-          <input type="url" id="imageUrl" class="form-control" />
+        <div class="mb-3 d-none" id="currentImageWrapper">
+          <label class="form-label">Current Image</label>
+          <div>
+            <img id="currentImage" class="rounded" style="max-height:150px;" />
+          </div>
         </div>
         <div class="mb-3">
           <label for="content" class="form-label">Content</label>

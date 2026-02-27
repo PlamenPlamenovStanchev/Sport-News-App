@@ -10,7 +10,7 @@
 import { requireAuth, getCurrentProfile, logout } from "../utils/auth.js";
 import { initNavbar } from "../utils/navbar.js";
 import { supabase } from "../services/supabaseClient.js";
-import { createNews, uploadArticleImage, fetchCategories, fetchMyArticles } from "../services/newsService.js";
+import { createNews, uploadArticleImage, fetchCategories, fetchMyArticles, fetchPendingArticles, approveArticle, updateNews, deleteNews } from "../services/newsService.js";
 
 // ─── Auth Guard ───────────────────────────────────────────────────────────────
 // requireAuth() redirects to /login if the user is not logged in.
@@ -48,6 +48,197 @@ if (profile?.role === "author" || profile?.role === "admin") {
   document.getElementById("addNewsBtn").classList.remove("d-none");
   await initCreateNewsModal(user);
   await loadMyArticles(user.id);
+}
+
+// ─── Editor: Show pending articles for moderation ─────────────────────────────
+
+if (profile?.role === "editor" || profile?.role === "admin") {
+  await loadPendingArticles();
+  initEditArticleModal();
+}
+
+/**
+ * Fetch and render all pending articles for editor moderation.
+ */
+async function loadPendingArticles() {
+  const section    = document.getElementById("editorSection");
+  const list       = document.getElementById("pendingArticlesList");
+  const noPending  = document.getElementById("noPending");
+
+  section.classList.remove("d-none");
+
+  const { data: articles, error: err } = await fetchPendingArticles();
+
+  if (err) {
+    console.error("Pending articles error:", err.message);
+    return;
+  }
+
+  if (!articles || articles.length === 0) {
+    noPending.classList.remove("d-none");
+    return;
+  }
+
+  list.innerHTML = `
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>Image</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${articles.map((a) => {
+            const date = new Date(a.created_at).toLocaleDateString("en-GB", {
+              day: "numeric", month: "short", year: "numeric",
+            });
+            return `
+              <tr id="pending-row-${a.id}">
+                <td style="width:80px;">
+                  <img src="${a.image_url || 'https://placehold.co/80x50?text=No+Img'}"
+                       alt="${escapeHtml(a.title)}" class="rounded"
+                       style="width:80px;height:50px;object-fit:cover;" />
+                </td>
+                <td class="fw-semibold">${escapeHtml(a.title)}</td>
+                <td>${escapeHtml(a.categories?.name ?? '—')}</td>
+                <td><span class="badge bg-warning text-dark">Pending</span></td>
+                <td class="text-muted small">${date}</td>
+                <td class="text-end">
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-success btn-approve" data-id="${a.id}">Approve</button>
+                    <button class="btn btn-primary btn-edit"
+                            data-id="${a.id}"
+                            data-title="${escapeHtml(a.title)}"
+                            data-content="${escapeHtml(a.content)}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editArticleModal">Edit</button>
+                    <button class="btn btn-danger btn-delete" data-id="${a.id}">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  // ─── Approve buttons ─────────────────────────────────────────
+  list.querySelectorAll(".btn-approve").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      btn.disabled = true;
+      btn.textContent = "Approving…";
+
+      const { error } = await approveArticle(id);
+      if (error) {
+        alert("Failed to approve: " + error.message);
+        btn.disabled = false;
+        btn.textContent = "Approve";
+        return;
+      }
+
+      // Remove the row from the table
+      const row = document.getElementById(`pending-row-${id}`);
+      if (row) row.remove();
+
+      // If no more rows, show empty message
+      if (!list.querySelector("tbody tr")) {
+        list.innerHTML = "";
+        noPending.classList.remove("d-none");
+      }
+    });
+  });
+
+  // ─── Edit buttons (pre-fill modal) ───────────────────────────
+  list.querySelectorAll(".btn-edit").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.getElementById("editArticleId").value = btn.dataset.id;
+      document.getElementById("editTitle").value = btn.dataset.title;
+      document.getElementById("editContent").value = btn.dataset.content;
+      document.getElementById("editModalError").classList.add("d-none");
+      document.getElementById("editModalSuccess").classList.add("d-none");
+    });
+  });
+
+  // ─── Delete buttons ──────────────────────────────────────────
+  list.querySelectorAll(".btn-delete").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (!confirm("Are you sure you want to permanently delete this article?")) return;
+
+      const id = btn.dataset.id;
+      btn.disabled = true;
+      btn.textContent = "Deleting…";
+
+      const { error } = await deleteNews(id);
+      if (error) {
+        alert("Failed to delete: " + error.message);
+        btn.disabled = false;
+        btn.textContent = "Delete";
+        return;
+      }
+
+      const row = document.getElementById(`pending-row-${id}`);
+      if (row) row.remove();
+
+      if (!list.querySelector("tbody tr")) {
+        list.innerHTML = "";
+        noPending.classList.remove("d-none");
+      }
+    });
+  });
+}
+
+/**
+ * Wire up the Edit Article modal form (save changes).
+ */
+function initEditArticleModal() {
+  const form       = document.getElementById("editArticleForm");
+  const modalError = document.getElementById("editModalError");
+  const modalSuccess = document.getElementById("editModalSuccess");
+  const saveBtn    = document.getElementById("saveEditBtn");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    modalError.classList.add("d-none");
+    modalSuccess.classList.add("d-none");
+
+    const id      = document.getElementById("editArticleId").value;
+    const title   = document.getElementById("editTitle").value.trim();
+    const content = document.getElementById("editContent").value.trim();
+
+    if (!title || !content) {
+      modalError.textContent = "Title and content are required.";
+      modalError.classList.remove("d-none");
+      return;
+    }
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving…";
+
+    const { error } = await updateNews(id, { title, content });
+
+    if (error) {
+      modalError.textContent = "Failed to save: " + error.message;
+      modalError.classList.remove("d-none");
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save Changes";
+      return;
+    }
+
+    modalSuccess.textContent = "Article updated successfully!";
+    modalSuccess.classList.remove("d-none");
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Save Changes";
+
+    // Refresh the pending list to reflect changes
+    await loadPendingArticles();
+  });
 }
 
 /**

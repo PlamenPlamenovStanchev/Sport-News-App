@@ -83,6 +83,13 @@
           <p id="noArticles" class="text-muted d-none">You haven't written any articles yet.</p>
         </div>
 
+        <!-- Editor: Pending Articles (visible only for editors/admins — toggled by profile.js) -->
+        <div id="editorSection" class="d-none mb-5">
+          <h4 class="mb-3">Pending Articles (Moderation)</h4>
+          <div id="pendingArticlesList"></div>
+          <p id="noPending" class="text-muted d-none">No articles awaiting moderation.</p>
+        </div>
+
         <hr class="mb-5" />
 
         <!-- Favorites -->
@@ -134,6 +141,35 @@
               <button type="submit" class="btn btn-dark w-100" id="submitNewsBtn">
                 Submit for Approval
               </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Edit Article Modal (Editor) ═══ -->
+    <div class="modal fade" id="editArticleModal" tabindex="-1" aria-labelledby="editArticleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editArticleModalLabel">Edit Article</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="editModalError" class="alert alert-danger d-none"></div>
+            <div id="editModalSuccess" class="alert alert-success d-none"></div>
+
+            <form id="editArticleForm">
+              <input type="hidden" id="editArticleId" />
+              <div class="mb-3">
+                <label for="editTitle" class="form-label">Title</label>
+                <input type="text" id="editTitle" class="form-control" required />
+              </div>
+              <div class="mb-3">
+                <label for="editContent" class="form-label">Content</label>
+                <textarea id="editContent" class="form-control" rows="8" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-dark w-100" id="saveEditBtn">Save Changes</button>
             </form>
           </div>
         </div>
