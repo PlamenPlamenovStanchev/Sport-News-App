@@ -44,6 +44,12 @@ document.getElementById("logoutBtn").addEventListener("click", logout);
 
 // ─── Author: Show "Add News" button ──────────────────────────────────────────
 
+// ─── Admin: Show Admin Panel button ───────────────────────────────────────────
+
+if (profile?.role === "admin") {
+  document.getElementById("adminPanelBtn").classList.remove("d-none");
+}
+
 if (profile?.role === "author" || profile?.role === "admin") {
   document.getElementById("addNewsBtn").classList.remove("d-none");
   await initCreateNewsModal(user);

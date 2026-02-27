@@ -59,7 +59,15 @@
             <span class="badge bg-secondary" id="profileRole">—</span>
           </div>
           <div class="ms-auto d-flex gap-2">
-            <!-- Visible only to authors (toggled by profile.js) -->
+            <!-- Visible only to admins (toggled by profile.js) -->
+            <a
+              id="adminPanelBtn"
+              class="btn btn-warning d-none"
+              href="/pages/admin.html"
+            >
+              Admin Panel
+            </a>
+            <!-- Visible only to authors/admins (toggled by profile.js) -->
             <button
               id="addNewsBtn"
               class="btn btn-success d-none"

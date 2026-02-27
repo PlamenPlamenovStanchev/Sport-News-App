@@ -194,6 +194,36 @@ export async function approveArticle(id) {
 }
 
 /**
+ * Fetch ALL articles (any status) for admin management.
+ *
+ * @returns {Promise<{ data: object[]|null, error: object|null }>}
+ */
+export async function fetchAllArticles() {
+  const { data, error } = await supabase
+    .from("news_articles")
+    .select("id, title, content, image_url, is_published, created_at, author_id, category_id, categories(name)")
+    .order("created_at", { ascending: false });
+
+  return { data, error };
+}
+
+/**
+ * Create an article as admin (published immediately).
+ *
+ * @param {{ title: string, content: string, image_url: string|null, category_id: string, author_id: string }} article
+ * @returns {Promise<{ data: object|null, error: object|null }>}
+ */
+export async function createNewsAsAdmin(article) {
+  const { data, error } = await supabase
+    .from("news_articles")
+    .insert([{ ...article, is_published: true }])
+    .select()
+    .single();
+
+  return { data, error };
+}
+
+/**
  * Reject / unpublish a news article (set is_published = false).
  *
  * @param {string} id - UUID of the article.

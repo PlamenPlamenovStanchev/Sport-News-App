@@ -3,7 +3,7 @@
 // Renders auth-aware links into the element with id="navAuthLinks".
 // Call initNavbar() from every page module that has a navbar.
 
-import { getCurrentUser, logout } from "./auth.js";
+import { getCurrentUser, getCurrentProfile, logout } from "./auth.js";
 
 /**
  * Reads the current auth state and injects the correct links into #navAuthLinks.
@@ -16,6 +16,15 @@ export async function initNavbar() {
   const user = await getCurrentUser();
 
   if (user) {
+    // Fetch role for role-specific nav items
+    const { profile } = await getCurrentProfile();
+    const role = profile?.role ?? "user";
+
+    // Admin Panel link (visible only to admins)
+    const adminLink = role === "admin"
+      ? `<li class="nav-item"><a class="nav-link text-warning fw-semibold" href="/pages/admin.html">Admin Panel</a></li>`
+      : "";
+
     // Logged-in links
     container.innerHTML = `
       <li class="nav-item">
@@ -24,6 +33,7 @@ export async function initNavbar() {
       <li class="nav-item">
         <a class="nav-link" href="/pages/about.html">About</a>
       </li>
+      ${adminLink}
       <li class="nav-item">
         <a class="nav-link fw-semibold" href="/profile/">My Profile</a>
       </li>
