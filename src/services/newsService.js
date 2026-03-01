@@ -23,7 +23,7 @@ export async function fetchApprovedNews({ page = 1, limit = 6, category = "all",
 
   let query = supabase
     .from("news_articles")
-    .select("id, title, image_url, category_id, created_at, author_id, categories(name)", { count: "exact" })
+    .select("id, title, image_url, category_id, created_at, author_id, categories(name), article_likes(count), comments(count), article_views(count)", { count: "exact" })
     .eq("is_published", true)
     .order("created_at", { ascending: false })
     .range(from, to);
@@ -439,4 +439,22 @@ export async function fetchUserFavourites(userId) {
     .order("created_at", { ascending: false });
 
   return { data, error };
+}
+
+// ─── VIEWS ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Record that a user has read/viewed an article.
+ * Uses upsert to silently ignore duplicate views.
+ *
+ * @param {string} userId    - UUID of the user.
+ * @param {string} articleId - UUID of the article.
+ * @returns {Promise<{ error: object|null }>}
+ */
+export async function recordArticleView(userId, articleId) {
+  const { error } = await supabase
+    .from("article_views")
+    .upsert({ user_id: userId, article_id: articleId }, { onConflict: "user_id,article_id" });
+
+  return { error };
 }

@@ -3,7 +3,7 @@
 // Fetches and renders a single news article and its comments.
 // Reads the article ID from the URL query string: ?id=<uuid>
 
-import { fetchNewsById, fetchCommentsByArticle, postComment, toggleArticleLike, countArticleLikes, hasUserLiked, toggleArticleFavourite, hasUserFavourited } from "../services/newsService.js";
+import { fetchNewsById, fetchCommentsByArticle, postComment, toggleArticleLike, countArticleLikes, hasUserLiked, toggleArticleFavourite, hasUserFavourited, recordArticleView } from "../services/newsService.js";
 import { getCurrentUser } from "../utils/auth.js";
 
 // ─── Read ID from URL ─────────────────────────────────────────────────────────
@@ -22,6 +22,10 @@ if (!newsId) {
 
 async function init() {
   const [user] = await Promise.all([getCurrentUser(), loadArticle(), loadComments()]);
+  // Record view for logged-in users (fire-and-forget)
+  if (user) {
+    recordArticleView(user.id, newsId);
+  }
   await Promise.all([initLikeButton(user), initFavouriteButton(user)]);
   handleCommentForm(user);
 }

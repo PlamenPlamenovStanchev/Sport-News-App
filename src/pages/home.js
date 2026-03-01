@@ -127,7 +127,12 @@ function renderNewsCards(articles) {
             <div class="card-body d-flex flex-column">
               <span class="badge bg-secondary mb-2">${escapeHtml(article.categories?.name ?? "")}</span>
               <h5 class="card-title">${escapeHtml(article.title)}</h5>
-              <p class="text-muted small mt-auto">${formatDate(article.created_at)}</p>
+              <div class="d-flex justify-content-between align-items-center text-muted small mt-auto">
+                <span title="Likes">&#9829; ${article.article_likes?.[0]?.count ?? 0}</span>
+                <span title="Views">&#128065; ${article.article_views?.[0]?.count ?? 0}</span>
+                <span>${formatDate(article.created_at)}</span>
+                <span title="Comments">&#128172; ${article.comments?.[0]?.count ?? 0}</span>
+              </div>
               <a
                 href="/pages/news-details.html?id=${article.id}"
                 class="btn btn-dark btn-sm mt-2"
