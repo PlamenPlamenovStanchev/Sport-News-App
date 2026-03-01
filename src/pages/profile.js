@@ -10,7 +10,7 @@
 import { requireAuth, getCurrentProfile, logout } from "../utils/auth.js";
 import { initNavbar } from "../utils/navbar.js";
 import { supabase } from "../services/supabaseClient.js";
-import { createNews, uploadArticleImage, fetchCategories, fetchMyArticles, fetchPendingArticles, approveArticle, updateNews, deleteNews } from "../services/newsService.js";
+import { createNews, uploadArticleImage, fetchCategories, fetchMyArticles, fetchPendingArticles, approveArticle, updateNews, deleteNews, countUserComments } from "../services/newsService.js";
 
 // ─── Auth Guard ───────────────────────────────────────────────────────────────
 // requireAuth() redirects to /login if the user is not logged in.
@@ -41,6 +41,15 @@ document.getElementById("profileRole").textContent     = profile?.role ?? "user"
 // logout() calls supabase.auth.signOut() then redirects to /
 
 document.getElementById("logoutBtn").addEventListener("click", logout);
+
+// ─── Comment Counter ──────────────────────────────────────────────────────────
+
+{
+  const { count, error } = await countUserComments(user.id);
+  if (!error) {
+    document.getElementById("commentCount").textContent = count;
+  }
+}
 
 // ─── Author: Show "Add News" button ──────────────────────────────────────────
 

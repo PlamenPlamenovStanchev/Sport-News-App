@@ -3,8 +3,7 @@
 // Fetches and renders a single news article and its comments.
 // Reads the article ID from the URL query string: ?id=<uuid>
 
-import { fetchNewsById } from "../services/newsService.js";
-import { supabase } from "../services/supabaseClient.js";
+import { fetchNewsById, fetchCommentsByArticle, postComment } from "../services/newsService.js";
 import { getCurrentUser } from "../utils/auth.js";
 
 // ─── Read ID from URL ─────────────────────────────────────────────────────────
@@ -56,11 +55,7 @@ async function loadArticle() {
 // ─── Comments ─────────────────────────────────────────────────────────────────
 
 async function loadComments() {
-  const { data: comments, error } = await supabase
-    .from("comments")
-    .select("id, content, created_at, user_id, profiles(username)")
-    .eq("news_id", newsId)
-    .order("created_at", { ascending: false });
+  const { data: comments, error } = await fetchCommentsByArticle(newsId);
 
   const list = document.getElementById("commentsList");
 
@@ -112,9 +107,11 @@ function handleCommentForm(user) {
     const content = document.getElementById("commentInput").value.trim();
     if (!content) return;
 
-    const { error } = await supabase.from("comments").insert([
-      { news_id: newsId, user_id: user.id, content },
-    ]);
+    const { error } = await postComment({
+      article_id: newsId,
+      user_id: user.id,
+      content,
+    });
 
     if (error) {
       alert("Failed to post comment: " + error.message);

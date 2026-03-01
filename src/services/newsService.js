@@ -236,3 +236,52 @@ export async function rejectArticle(id) {
     .eq("id", id);
   return { error };
 }
+
+// ─── COMMENTS ─────────────────────────────────────────────────────────────────
+
+/**
+ * Fetch all comments for a given article, newest first.
+ *
+ * @param {string} articleId - UUID of the article.
+ * @returns {Promise<{ data: object[]|null, error: object|null }>}
+ */
+export async function fetchCommentsByArticle(articleId) {
+  const { data, error } = await supabase
+    .from("comments")
+    .select("id, content, created_at, user_id, profiles!comments_user_id_profiles_fk(username)")
+    .eq("article_id", articleId)
+    .order("created_at", { ascending: false });
+
+  return { data, error };
+}
+
+/**
+ * Insert a new comment for an article.
+ *
+ * @param {{ article_id: string, user_id: string, content: string }} comment
+ * @returns {Promise<{ data: object|null, error: object|null }>}
+ */
+export async function postComment({ article_id, user_id, content }) {
+  const { data, error } = await supabase
+    .from("comments")
+    .insert([{ article_id, user_id, content }])
+    .select()
+    .single();
+
+  return { data, error };
+}
+
+/**
+ * Count total comments written by a specific user.
+ *
+ * @param {string} userId - UUID of the user.
+ * @returns {Promise<{ count: number, error: object|null }>}
+ */
+export async function countUserComments(userId) {
+  const { count, error } = await supabase
+    .from("comments")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId);
+
+  return { count: count ?? 0, error };
+}
