@@ -23,18 +23,40 @@ export async function fetchApprovedNews({ page = 1, limit = 6, category = "all",
 
   let query = supabase
     .from("news_articles")
-    .select("id, title, image_url, category_id, created_at, author_id, categories(name), article_likes(count), comments(count), article_views(count)", { count: "exact" })
+    .select(
+      "id, title, image_url, category_id, created_at, author_id, " +
+      "profiles!news_articles_author_id_profiles_fk(username), " +
+      "categories(name), article_likes(count), comments(count), article_views(count)",
+      { count: "exact" }
+    )
     .eq("is_published", true)
     .order("created_at", { ascending: false })
     .range(from, to);
 
   if (category && category !== "all") {
-    // Filter by category_id directly on news_articles
     query = query.eq("category_id", category);
   }
 
   if (search.trim()) {
-    query = query.ilike("title", `%${search.trim()}%`);
+    const term = search.trim();
+
+    // Find author IDs whose username matches the search term
+    const { data: matchingProfiles } = await supabase
+      .from("profiles")
+      .select("id")
+      .ilike("username", `%${term}%`);
+
+    const authorIds = matchingProfiles?.map((p) => p.id) || [];
+
+    if (authorIds.length > 0) {
+      // Combine title match OR author match
+      query = query.or(
+        `title.ilike.%${term}%,author_id.in.(${authorIds.join(",")})`
+      );
+    } else {
+      // No matching authors — search by title only
+      query = query.ilike("title", `%${term}%`);
+    }
   }
 
   const { data, count, error } = await query;

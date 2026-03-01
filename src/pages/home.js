@@ -127,6 +127,7 @@ function renderNewsCards(articles) {
             <div class="card-body d-flex flex-column">
               <span class="badge bg-secondary mb-2">${escapeHtml(article.categories?.name ?? "")}</span>
               <h5 class="card-title">${escapeHtml(article.title)}</h5>
+              ${article.profiles?.username ? `<p class="text-muted small mb-1">by ${escapeHtml(article.profiles.username)}</p>` : ""}
               <div class="d-flex justify-content-between align-items-center text-muted small mt-auto">
                 <span title="Likes">&#9829; ${article.article_likes?.[0]?.count ?? 0}</span>
                 <span title="Views">&#128065; ${article.article_views?.[0]?.count ?? 0}</span>
