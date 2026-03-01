@@ -50,7 +50,7 @@ if (profile?.role === "admin") {
   document.getElementById("adminPanelBtn").classList.remove("d-none");
 }
 
-if (profile?.role === "author" || profile?.role === "admin") {
+if (profile?.role === "author") {
   document.getElementById("addNewsBtn").classList.remove("d-none");
   await initCreateNewsModal(user);
   await loadMyArticles(user.id);
