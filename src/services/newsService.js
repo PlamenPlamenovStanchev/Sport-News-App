@@ -95,7 +95,7 @@ export async function fetchPendingArticles() {
 export async function fetchNewsById(id) {
   const { data, error } = await supabase
     .from("news_articles")
-    .select("*, categories(name)")
+    .select("*, categories(name), profiles!news_articles_author_id_profiles_fk(username)")
     .eq("id", id)
     .single();
 

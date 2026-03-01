@@ -55,6 +55,15 @@ async function loadArticle() {
     }
     <div class="article-body">${escapeHtml(article.content)}</div>
   `;
+
+  // Render author section
+  const authorName = article.profiles?.username;
+  if (authorName) {
+    const section = document.getElementById("authorSection");
+    document.getElementById("authorAvatar").textContent = authorName.charAt(0).toUpperCase();
+    document.getElementById("authorName").textContent = authorName;
+    section.classList.remove("d-none");
+  }
 }
 
 // ─── Comments ─────────────────────────────────────────────────────────────────
