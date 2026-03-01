@@ -371,3 +371,72 @@ export async function countUserLikes(userId) {
 
   return { count: count ?? 0, error };
 }
+
+// ─── FAVOURITES ─────────────────────────────────────────────────────────────────
+
+/**
+ * Toggle a favourite for the current user on an article.
+ * Inserts if not favourited, deletes if already favourited.
+ *
+ * @param {string} userId    - UUID of the user.
+ * @param {string} articleId - UUID of the article.
+ * @returns {Promise<{ favourited: boolean, error: object|null }>}
+ */
+export async function toggleArticleFavourite(userId, articleId) {
+  const { data: existing, error: selErr } = await supabase
+    .from("article_favourites")
+    .select("user_id")
+    .eq("user_id", userId)
+    .eq("article_id", articleId)
+    .maybeSingle();
+
+  if (selErr) return { favourited: false, error: selErr };
+
+  if (existing) {
+    const { error } = await supabase
+      .from("article_favourites")
+      .delete()
+      .eq("user_id", userId)
+      .eq("article_id", articleId);
+    return { favourited: false, error };
+  } else {
+    const { error } = await supabase
+      .from("article_favourites")
+      .insert([{ user_id: userId, article_id: articleId }]);
+    return { favourited: true, error };
+  }
+}
+
+/**
+ * Check whether a user has favourited a specific article.
+ *
+ * @param {string} userId    - UUID of the user.
+ * @param {string} articleId - UUID of the article.
+ * @returns {Promise<{ favourited: boolean, error: object|null }>}
+ */
+export async function hasUserFavourited(userId, articleId) {
+  const { data, error } = await supabase
+    .from("article_favourites")
+    .select("user_id")
+    .eq("user_id", userId)
+    .eq("article_id", articleId)
+    .maybeSingle();
+
+  return { favourited: !!data, error };
+}
+
+/**
+ * Fetch all articles the user has favourited, with full article data.
+ *
+ * @param {string} userId - UUID of the user.
+ * @returns {Promise<{ data: object[]|null, error: object|null }>}
+ */
+export async function fetchUserFavourites(userId) {
+  const { data, error } = await supabase
+    .from("article_favourites")
+    .select("article_id, news_articles(id, title, image_url, categories(name))")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  return { data, error };
+}

@@ -10,7 +10,7 @@
 import { requireAuth, getCurrentProfile, logout } from "../utils/auth.js";
 import { initNavbar } from "../utils/navbar.js";
 import { supabase } from "../services/supabaseClient.js";
-import { createNews, uploadArticleImage, fetchCategories, fetchMyArticles, fetchPendingArticles, approveArticle, updateNews, deleteNews, countUserComments, countUserLikes } from "../services/newsService.js";
+import { createNews, uploadArticleImage, fetchCategories, fetchMyArticles, fetchPendingArticles, approveArticle, updateNews, deleteNews, countUserComments, countUserLikes, fetchUserFavourites } from "../services/newsService.js";
 
 // ─── Auth Guard ───────────────────────────────────────────────────────────────
 // requireAuth() redirects to /login if the user is not logged in.
@@ -414,10 +414,7 @@ async function initCreateNewsModal(currentUser) {
 const favoritesList = document.getElementById("favoritesList");
 const noFavorites   = document.getElementById("noFavorites");
 
-const { data: favorites, error } = await supabase
-  .from("favorites")
-  .select("news_id, news_articles(id, title, image_url, category_id, categories(name))")
-  .eq("user_id", user.id);
+const { data: favorites, error } = await fetchUserFavourites(user.id);
 
 if (error) {
   console.error("Favorites error:", error.message);

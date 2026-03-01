@@ -3,7 +3,7 @@
 // Fetches and renders a single news article and its comments.
 // Reads the article ID from the URL query string: ?id=<uuid>
 
-import { fetchNewsById, fetchCommentsByArticle, postComment, toggleArticleLike, countArticleLikes, hasUserLiked } from "../services/newsService.js";
+import { fetchNewsById, fetchCommentsByArticle, postComment, toggleArticleLike, countArticleLikes, hasUserLiked, toggleArticleFavourite, hasUserFavourited } from "../services/newsService.js";
 import { getCurrentUser } from "../utils/auth.js";
 
 // ─── Read ID from URL ─────────────────────────────────────────────────────────
@@ -22,7 +22,7 @@ if (!newsId) {
 
 async function init() {
   const [user] = await Promise.all([getCurrentUser(), loadArticle(), loadComments()]);
-  await initLikeButton(user);
+  await Promise.all([initLikeButton(user), initFavouriteButton(user)]);
   handleCommentForm(user);
 }
 
@@ -126,6 +126,42 @@ function updateLikeBtn(btn, liked) {
     btn.innerHTML = "&#9825; Like";
     btn.classList.remove("btn-danger");
     btn.classList.add("btn-outline-danger");
+  }
+}
+
+// ─── Favourite Button ──────────────────────────────────────────────────────────
+
+async function initFavouriteButton(user) {
+  const btn = document.getElementById("favBtn");
+
+  if (!user) return; // not logged in — button stays hidden
+
+  const { favourited } = await hasUserFavourited(user.id, newsId);
+  updateFavBtn(btn, favourited);
+  btn.classList.remove("d-none");
+
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    const { favourited: nowFav, error } = await toggleArticleFavourite(user.id, newsId);
+    if (error) {
+      console.error("Favourite error:", error.message);
+      btn.disabled = false;
+      return;
+    }
+    updateFavBtn(btn, nowFav);
+    btn.disabled = false;
+  });
+}
+
+function updateFavBtn(btn, favourited) {
+  if (favourited) {
+    btn.innerHTML = "&#9733; Favourited";
+    btn.classList.remove("btn-outline-warning");
+    btn.classList.add("btn-warning");
+  } else {
+    btn.innerHTML = "&#9734; Favourite";
+    btn.classList.remove("btn-warning");
+    btn.classList.add("btn-outline-warning");
   }
 }
 
