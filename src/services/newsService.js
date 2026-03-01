@@ -29,8 +29,8 @@ export async function fetchApprovedNews({ page = 1, limit = 6, category = "all",
     .range(from, to);
 
   if (category && category !== "all") {
-    // Filter by category name via the join
-    query = query.eq("categories.name", category);
+    // Filter by category_id directly on news_articles
+    query = query.eq("category_id", category);
   }
 
   if (search.trim()) {

@@ -54,7 +54,7 @@ async function loadCategories() {
 
   const allBtn = `<button class="btn btn-dark btn-sm active" data-category="all">All</button>`;
   const catBtns = categories
-    .map((c) => `<button class="btn btn-outline-dark btn-sm" data-category="${escapeHtml(c.name)}">${escapeHtml(c.name)}</button>`)
+    .map((c) => `<button class="btn btn-outline-dark btn-sm" data-category="${c.id}">${escapeHtml(c.name)}</button>`)
     .join("");
 
   categoryFilters.innerHTML = allBtn + catBtns;
