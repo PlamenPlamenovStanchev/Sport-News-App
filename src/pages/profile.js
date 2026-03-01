@@ -10,7 +10,7 @@
 import { requireAuth, getCurrentProfile, logout } from "../utils/auth.js";
 import { initNavbar } from "../utils/navbar.js";
 import { supabase } from "../services/supabaseClient.js";
-import { createNews, uploadArticleImage, fetchCategories, fetchMyArticles, fetchPendingArticles, approveArticle, updateNews, deleteNews, countUserComments } from "../services/newsService.js";
+import { createNews, uploadArticleImage, fetchCategories, fetchMyArticles, fetchPendingArticles, approveArticle, updateNews, deleteNews, countUserComments, countUserLikes } from "../services/newsService.js";
 
 // ─── Auth Guard ───────────────────────────────────────────────────────────────
 // requireAuth() redirects to /login if the user is not logged in.
@@ -48,6 +48,15 @@ document.getElementById("logoutBtn").addEventListener("click", logout);
   const { count, error } = await countUserComments(user.id);
   if (!error) {
     document.getElementById("commentCount").textContent = count;
+  }
+}
+
+// ─── Like Counter ─────────────────────────────────────────────────────────────
+
+{
+  const { count, error } = await countUserLikes(user.id);
+  if (!error) {
+    document.getElementById("likeCount").textContent = count;
   }
 }
 

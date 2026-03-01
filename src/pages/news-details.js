@@ -3,7 +3,7 @@
 // Fetches and renders a single news article and its comments.
 // Reads the article ID from the URL query string: ?id=<uuid>
 
-import { fetchNewsById, fetchCommentsByArticle, postComment } from "../services/newsService.js";
+import { fetchNewsById, fetchCommentsByArticle, postComment, toggleArticleLike, countArticleLikes, hasUserLiked } from "../services/newsService.js";
 import { getCurrentUser } from "../utils/auth.js";
 
 // ─── Read ID from URL ─────────────────────────────────────────────────────────
@@ -22,6 +22,7 @@ if (!newsId) {
 
 async function init() {
   const [user] = await Promise.all([getCurrentUser(), loadArticle(), loadComments()]);
+  await initLikeButton(user);
   handleCommentForm(user);
 }
 
@@ -82,6 +83,50 @@ async function loadComments() {
     `
     )
     .join("");
+}
+
+// ─── Like Button ──────────────────────────────────────────────────────────────
+
+async function initLikeButton(user) {
+  const btn = document.getElementById("likeBtn");
+  const countEl = document.getElementById("likeCount");
+
+  // Load total likes for this article
+  const { count } = await countArticleLikes(newsId);
+  countEl.textContent = count;
+
+  if (!user) return; // not logged in — button stays hidden
+
+  // Check if current user already liked
+  const { liked } = await hasUserLiked(user.id, newsId);
+  updateLikeBtn(btn, liked);
+  btn.classList.remove("d-none");
+
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    const { liked: nowLiked, error } = await toggleArticleLike(user.id, newsId);
+    if (error) {
+      console.error("Like error:", error.message);
+      btn.disabled = false;
+      return;
+    }
+    updateLikeBtn(btn, nowLiked);
+    const { count: newCount } = await countArticleLikes(newsId);
+    countEl.textContent = newCount;
+    btn.disabled = false;
+  });
+}
+
+function updateLikeBtn(btn, liked) {
+  if (liked) {
+    btn.innerHTML = "&#9829; Liked";
+    btn.classList.remove("btn-outline-danger");
+    btn.classList.add("btn-danger");
+  } else {
+    btn.innerHTML = "&#9825; Like";
+    btn.classList.remove("btn-danger");
+    btn.classList.add("btn-outline-danger");
+  }
 }
 
 // ─── Comment Form ─────────────────────────────────────────────────────────────

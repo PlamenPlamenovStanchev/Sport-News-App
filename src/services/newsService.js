@@ -285,3 +285,89 @@ export async function countUserComments(userId) {
 
   return { count: count ?? 0, error };
 }
+
+// ─── LIKES ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Toggle a like for the current user on an article.
+ * Inserts if not liked, deletes if already liked.
+ *
+ * @param {string} userId    - UUID of the user.
+ * @param {string} articleId - UUID of the article.
+ * @returns {Promise<{ liked: boolean, error: object|null }>}
+ */
+export async function toggleArticleLike(userId, articleId) {
+  // Check if already liked
+  const { data: existing, error: selErr } = await supabase
+    .from("article_likes")
+    .select("user_id")
+    .eq("user_id", userId)
+    .eq("article_id", articleId)
+    .maybeSingle();
+
+  if (selErr) return { liked: false, error: selErr };
+
+  if (existing) {
+    // Unlike
+    const { error } = await supabase
+      .from("article_likes")
+      .delete()
+      .eq("user_id", userId)
+      .eq("article_id", articleId);
+    return { liked: false, error };
+  } else {
+    // Like
+    const { error } = await supabase
+      .from("article_likes")
+      .insert([{ user_id: userId, article_id: articleId }]);
+    return { liked: true, error };
+  }
+}
+
+/**
+ * Count total likes for a specific article.
+ *
+ * @param {string} articleId - UUID of the article.
+ * @returns {Promise<{ count: number, error: object|null }>}
+ */
+export async function countArticleLikes(articleId) {
+  const { count, error } = await supabase
+    .from("article_likes")
+    .select("user_id", { count: "exact", head: true })
+    .eq("article_id", articleId);
+
+  return { count: count ?? 0, error };
+}
+
+/**
+ * Check whether a user has liked a specific article.
+ *
+ * @param {string} userId    - UUID of the user.
+ * @param {string} articleId - UUID of the article.
+ * @returns {Promise<{ liked: boolean, error: object|null }>}
+ */
+export async function hasUserLiked(userId, articleId) {
+  const { data, error } = await supabase
+    .from("article_likes")
+    .select("user_id")
+    .eq("user_id", userId)
+    .eq("article_id", articleId)
+    .maybeSingle();
+
+  return { liked: !!data, error };
+}
+
+/**
+ * Count total likes made by a specific user.
+ *
+ * @param {string} userId - UUID of the user.
+ * @returns {Promise<{ count: number, error: object|null }>}
+ */
+export async function countUserLikes(userId) {
+  const { count, error } = await supabase
+    .from("article_likes")
+    .select("user_id", { count: "exact", head: true })
+    .eq("user_id", userId);
+
+  return { count: count ?? 0, error };
+}
