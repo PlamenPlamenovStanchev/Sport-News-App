@@ -3,6 +3,11 @@ import { defineConfig } from "vite";
 
 // https://vitejs.dev/guide/build#multi-page-app
 export default defineConfig({
+  test: {
+    globals: true,
+    environment: "node",
+    setupFiles: ["./tests/setup.js"],
+  },
   build: {
     // Allow top-level await (ES2022+). All modern browsers support this.
     target: "esnext",
