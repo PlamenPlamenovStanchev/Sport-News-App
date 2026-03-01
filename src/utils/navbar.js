@@ -33,6 +33,9 @@ export async function initNavbar() {
       <li class="nav-item">
         <a class="nav-link" href="/pages/about.html">About</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/pages/contact.html">Contact Us</a>
+      </li>
       ${adminLink}
       <li class="nav-item">
         <a class="nav-link fw-semibold" href="/profile/">My Profile</a>
@@ -53,6 +56,9 @@ export async function initNavbar() {
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/pages/about.html">About</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/pages/contact.html">Contact Us</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/login/">Login</a>

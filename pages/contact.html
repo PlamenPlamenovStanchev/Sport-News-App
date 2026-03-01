@@ -19,8 +19,12 @@
     </nav>
 
     <main class="container my-5" style="max-width: 600px;">
-      <h1 class="mb-4">Contact Us</h1>
-      <p class="text-muted">Have feedback or questions? Fill in the form below.</p>
+      <h1 class="mb-3">Become a Contributor</h1>
+      <p class="text-muted mb-4">
+        Passionate about sport and want to share your voice? We're always looking
+        for dedicated <strong>authors</strong> and <strong>editors</strong> to join
+        our team. Fill in the form below and tell us how you'd like to contribute.
+      </p>
 
       <div id="successMessage" class="alert alert-success d-none"></div>
 
@@ -30,14 +34,22 @@
           <input type="text" id="name" class="form-control" placeholder="John Doe" required />
         </div>
         <div class="mb-3">
-          <label for="email" class="form-label">Email address</label>
+          <label for="email" class="form-label">Email Address</label>
           <input type="email" id="email" class="form-control" placeholder="you@example.com" required />
         </div>
         <div class="mb-3">
-          <label for="message" class="form-label">Message</label>
-          <textarea id="message" class="form-control" rows="5" placeholder="Your message..." required></textarea>
+          <label for="role" class="form-label">I'd like to apply as</label>
+          <select id="role" class="form-select" required>
+            <option value="" disabled selected>Select a role...</option>
+            <option value="author">Author — write and submit articles</option>
+            <option value="editor">Editor — review and moderate content</option>
+          </select>
         </div>
-        <button type="submit" class="btn btn-dark">Send Message</button>
+        <div class="mb-3">
+          <label for="message" class="form-label">Tell us about yourself</label>
+          <textarea id="message" class="form-control" rows="5" placeholder="Your experience, favourite sports, why you want to contribute..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-dark w-100">Submit Application</button>
       </form>
     </main>
 
