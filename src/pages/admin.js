@@ -19,6 +19,8 @@ import {
   updateUserRole,
   deleteUserData,
   createUser,
+  fetchContactMessages,
+  deleteContactMessage,
 } from "../services/adminService.js";
 
 // ─── Auth Guard ───────────────────────────────────────────────────────────────
@@ -56,6 +58,7 @@ function loadTab(tab) {
   tabContent.innerHTML = `<p class="text-muted">Loading…</p>`;
   if (tab === "news") loadNewsTab();
   else if (tab === "users") loadUsersTab();
+  else if (tab === "messages") loadMessagesTab();
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -565,5 +568,68 @@ function showConfirm({ title = "Confirm", body = "Are you sure?", okLabel = "Con
     modalEl.addEventListener("hidden.bs.modal", onHidden, { once: true });
 
     modal.show();
+  });
+}
+
+// ─── MESSAGES TAB ───────────────────────────────────────────────────────
+
+async function loadMessagesTab() {
+  const { data: messages, error } = await fetchContactMessages();
+  if (error) {
+    tabContent.innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
+    return;
+  }
+
+  if (!messages || messages.length === 0) {
+    tabContent.innerHTML = `<p class="text-muted">No messages yet.</p>`;
+    return;
+  }
+
+  tabContent.innerHTML = `
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Subject</th>
+            <th>Message</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${messages
+            .map(
+              (m) => `
+            <tr>
+              <td>${m.name}</td>
+              <td><a href="mailto:${m.email}">${m.email}</a></td>
+              <td>${m.subject || "—"}</td>
+              <td style="max-width:300px;white-space:pre-wrap">${m.message}</td>
+              <td>${new Date(m.created_at).toLocaleDateString()}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-danger delete-msg-btn" data-id="${m.id}">
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+              </td>
+            </tr>`
+            )
+            .join("")}
+        </tbody>
+      </table>
+    </div>`;
+
+  tabContent.querySelectorAll(".delete-msg-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const ok = await confirmDialog("Delete this message?");
+      if (!ok) return;
+      const { error: delErr } = await deleteContactMessage(btn.dataset.id);
+      if (delErr) {
+        alert("Delete failed: " + delErr.message);
+        return;
+      }
+      loadMessagesTab();
+    });
   });
 }

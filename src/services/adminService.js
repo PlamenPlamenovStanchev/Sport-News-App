@@ -118,3 +118,34 @@ export async function createUser({ email, password, username, role }) {
 
   return { user: authData.user, error: null };
 }
+
+// ─── CONTACT MESSAGES ───────────────────────────────────────────────────────
+
+/**
+ * Fetch all contact messages (admin only — RLS enforced).
+ *
+ * @returns {Promise<{ data: object[]|null, error: object|null }>}
+ */
+export async function fetchContactMessages() {
+  const { data, error } = await supabase
+    .from("contact_messages")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  return { data, error };
+}
+
+/**
+ * Delete a contact message by ID (admin only — RLS enforced).
+ *
+ * @param {string} id - UUID of the message.
+ * @returns {Promise<{ error: object|null }>}
+ */
+export async function deleteContactMessage(id) {
+  const { error } = await supabase
+    .from("contact_messages")
+    .delete()
+    .eq("id", id);
+
+  return { error };
+}
