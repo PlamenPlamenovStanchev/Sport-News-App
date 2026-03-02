@@ -1,0 +1,13 @@
+# ── Build settings ─────────────────────────────────────────
+[build]
+  command   = "npm run build"
+  publish   = "dist"
+
+# ── Redirects for multi-page app ──────────────────────────
+# Ensure direct URL access and page refreshes work correctly.
+# Vite outputs each HTML page into dist/, so Netlify serves
+# them as-is. This catch-all handles any unmatched route.
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
