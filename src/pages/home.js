@@ -123,31 +123,30 @@ function renderNewsCards(articles) {
     .map(
       (article, index) => `
         <div class="col-sm-6 col-lg-4">
-          <div class="card h-100 card-animated" style="animation-delay: ${index * 0.07}s;">
-            <div style="overflow:hidden;">
-              <img
-                src="${article.image_url || "https://placehold.co/600x300?text=No+Image"}"
-                class="card-img-top"
-                alt="${escapeHtml(article.title)}"
-                style="height: 200px; object-fit: cover;"
-              />
-            </div>
-            <div class="card-body d-flex flex-column">
-              <span class="badge badge-category mb-2" style="align-self:flex-start;">${escapeHtml(article.categories?.name ?? "")}</span>
-              <h5 class="card-title">${escapeHtml(article.title)}</h5>
-              ${article.profiles?.username ? `<p class="text-muted small mb-1"><i data-lucide="pen-tool" class="icon-sm"></i> ${escapeHtml(article.profiles.username)}</p>` : ""}
-              <div class="card-stats mt-auto">
-                <span title="Likes"><i data-lucide="heart" class="icon-sm"></i> ${article.article_likes?.[0]?.count ?? 0}</span>
-                <span title="Views"><i data-lucide="eye" class="icon-sm"></i> ${article.article_views?.[0]?.count ?? 0}</span>
-                <span title="Date"><i data-lucide="calendar" class="icon-sm"></i> ${formatDate(article.created_at)}</span>
-                <span title="Comments"><i data-lucide="message-circle" class="icon-sm"></i> ${article.comments?.[0]?.count ?? 0}</span>
+          <a href="/pages/news-details.html?id=${article.id}" class="text-decoration-none text-reset">
+            <div class="card h-100 card-animated card-clickable" style="animation-delay: ${index * 0.07}s;">
+              <div style="overflow:hidden;">
+                <img
+                  src="${article.image_url || "https://placehold.co/600x300?text=No+Image"}"
+                  class="card-img-top"
+                  alt="${escapeHtml(article.title)}"
+                  style="height: 200px; object-fit: cover;"
+                />
               </div>
-              <a
-                href="/pages/news-details.html?id=${article.id}"
-                class="btn btn-read-more mt-3"
-              >Read More <i data-lucide="arrow-right"></i></a>
+              <div class="card-body d-flex flex-column">
+                <span class="badge badge-category mb-2" style="align-self:flex-start;">${escapeHtml(article.categories?.name ?? "")}</span>
+                <h5 class="card-title">${escapeHtml(article.title)}</h5>
+                ${article.profiles?.username ? `<p class="text-muted small mb-1"><i data-lucide="pen-tool" class="icon-sm"></i> ${escapeHtml(article.profiles.username)}</p>` : ""}
+                <div class="card-stats mt-auto">
+                  <span title="Likes"><i data-lucide="heart" class="icon-sm"></i> ${article.article_likes?.[0]?.count ?? 0}</span>
+                  <span title="Views"><i data-lucide="eye" class="icon-sm"></i> ${article.article_views?.[0]?.count ?? 0}</span>
+                  <span title="Date"><i data-lucide="calendar" class="icon-sm"></i> ${formatDate(article.created_at)}</span>
+                  <span title="Comments"><i data-lucide="message-circle" class="icon-sm"></i> ${article.comments?.[0]?.count ?? 0}</span>
+                </div>
+                <span class="btn btn-read-more mt-3">Read More <i data-lucide="arrow-right"></i></span>
+              </div>
             </div>
-          </div>
+          </a>
         </div>
       `
     )

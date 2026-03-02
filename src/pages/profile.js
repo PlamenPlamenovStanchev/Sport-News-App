@@ -406,12 +406,19 @@ async function initCreateNewsModal(currentUser) {
       return;
     }
 
-    // Success
-    modalSuccess.textContent = "Article submitted! It will be reviewed by an editor.";
-    modalSuccess.classList.remove("d-none");
+    // Success — close modal and show toast
     form.reset();
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit for Approval";
+
+    const modalEl = document.getElementById("createNewsModal");
+    const bsModal = bootstrap.Modal.getInstance(modalEl);
+    if (bsModal) bsModal.hide();
+
+    showToast("Your article has been submitted for approval!", "success", 5000);
+
+    // Refresh author's article list
+    await loadMyArticles(currentUser.id);
   });
 }
 

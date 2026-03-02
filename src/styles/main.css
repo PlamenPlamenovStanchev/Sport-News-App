@@ -123,6 +123,10 @@ h1, h2, h3, .hero-title {
   transform: scale(1.03);
 }
 
+.card-clickable {
+  cursor: pointer;
+}
+
 .card .card-body {
   position: relative;
 }
