@@ -6,12 +6,18 @@
 import { requireRole } from "../utils/auth.js";
 import { createNews, uploadArticleImage, fetchCategories } from "../services/newsService.js";
 
+// Initialize Lucide icons
+if (window.lucide) window.lucide.createIcons();
+
 const errorMessage = document.getElementById("errorMessage");
 const successMessage = document.getElementById("successMessage");
 const form = document.getElementById("createNewsForm");
 
 // Guard: redirect non-authors
 const profile = await requireRole(["author", "admin"]);
+
+// Initialize Lucide icons
+if (window.lucide) window.lucide.createIcons();
 
 // Populate categories dropdown (if it exists on the page)
 const categorySelect = document.getElementById("newsCategory");

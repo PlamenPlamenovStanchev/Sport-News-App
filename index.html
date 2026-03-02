@@ -33,10 +33,10 @@
     </nav>
 
     <!-- Hero -->
-    <header class="bg-dark text-white py-4 py-md-5 text-center">
-      <div class="container">
+    <header class="hero-banner text-white py-4 py-md-5 text-center">
+      <div class="container position-relative">
         <h1 class="display-4 fw-bold hero-title">The Sport News App</h1>
-        <p class="lead hero-subtitle">Stay updated with the latest sport news</p>
+        <p class="lead hero-subtitle opacity-75">Stay updated with the latest sport news</p>
       </div>
     </header>
 
@@ -45,16 +45,19 @@
       <div class="row g-3 align-items-center">
         <!-- Search -->
         <div class="col-md-6">
-          <input
-            id="searchInput"
-            type="text"
-            class="form-control"
-            placeholder="Search by title or author..."
-          />
+          <div class="search-wrapper">
+            <i data-lucide="search"></i>
+            <input
+              id="searchInput"
+              type="text"
+              class="form-control search-input"
+              placeholder="Search by title or author..."
+            />
+          </div>
         </div>
         <!-- Category Filter (loaded dynamically from DB) -->
         <div class="col-md-6 d-flex flex-wrap gap-2" id="categoryFilters">
-          <button class="btn btn-dark btn-sm active" data-category="all">All</button>
+          <button class="category-pill active" data-category="all">All</button>
         </div>
       </div>
     </section>
@@ -79,6 +82,7 @@
       <p class="mb-0">&copy; 2026 Sport News App. All rights reserved.</p>
     </footer>
 
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     ></script>

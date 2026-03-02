@@ -5,6 +5,9 @@
 import { supabase } from "../services/supabaseClient.js";
 import { getCurrentUser } from "../utils/auth.js";
 
+// ─── Initialize Lucide icons ─────────────────────────────────────────────────
+if (window.lucide) window.lucide.createIcons();
+
 // ─── Guard: already logged in → skip straight to profile ─────────────────────
 
 const existingUser = await getCurrentUser();

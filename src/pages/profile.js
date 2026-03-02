@@ -11,6 +11,7 @@ import { requireAuth, getCurrentProfile, logout } from "../utils/auth.js";
 import { initNavbar } from "../utils/navbar.js";
 import { supabase } from "../services/supabaseClient.js";
 import { createNews, uploadArticleImage, fetchCategories, fetchMyArticles, fetchPendingArticles, approveArticle, updateNews, deleteNews, countUserComments, countUserLikes, fetchUserFavourites } from "../services/newsService.js";
+import { showToast } from "../utils/toast.js";
 
 // ─── Auth Guard ───────────────────────────────────────────────────────────────
 // requireAuth() redirects to /login if the user is not logged in.
@@ -26,6 +27,9 @@ await initNavbar();
 
 document.getElementById("profileLoading").classList.add("d-none");
 document.getElementById("profileContent").classList.remove("d-none");
+
+// Initialize Lucide icons
+if (window.lucide) window.lucide.createIcons();
 
 // ─── Fill in user details ─────────────────────────────────────────────────────
 
@@ -161,11 +165,12 @@ async function loadPendingArticles() {
 
       const { error } = await approveArticle(id);
       if (error) {
-        alert("Failed to approve: " + error.message);
+        showToast("Failed to approve: " + error.message, "error");
         btn.disabled = false;
         btn.textContent = "Approve";
         return;
       }
+      showToast("Article approved!", "success");
 
       // Remove the row from the table
       const row = document.getElementById(`pending-row-${id}`);
@@ -201,11 +206,12 @@ async function loadPendingArticles() {
 
       const { error } = await deleteNews(id);
       if (error) {
-        alert("Failed to delete: " + error.message);
+        showToast("Failed to delete: " + error.message, "error");
         btn.disabled = false;
         btn.textContent = "Delete";
         return;
       }
+      showToast("Article deleted.", "info");
 
       const row = document.getElementById(`pending-row-${id}`);
       if (row) row.remove();
@@ -425,28 +431,32 @@ if (!favorites || favorites.length === 0) {
 } else {
   favoritesList.innerHTML = favorites
     .map(
-      (f) => `
+      (f, index) => `
       <div class="col-sm-6 col-lg-4">
-        <div class="card h-100 shadow-sm">
-          <img
-            src="${f.news_articles?.image_url || "https://placehold.co/600x300?text=No+Image"}"
-            class="card-img-top"
-            style="height: 160px; object-fit: cover;"
-            alt="${escapeHtml(f.news_articles?.title ?? "")}"
-          />
+        <div class="card h-100 card-animated" style="animation-delay: ${index * 0.07}s;">
+          <div style="overflow:hidden;">
+            <img
+              src="${f.news_articles?.image_url || "https://placehold.co/600x300?text=No+Image"}"
+              class="card-img-top"
+              style="height: 160px; object-fit: cover;"
+              alt="${escapeHtml(f.news_articles?.title ?? "")}"
+            />
+          </div>
           <div class="card-body d-flex flex-column">
-            <span class="badge bg-secondary mb-1">${escapeHtml(f.news_articles?.categories?.name ?? "")}</span>
+            <span class="badge badge-category mb-1" style="align-self:flex-start;">${escapeHtml(f.news_articles?.categories?.name ?? "")}</span>
             <h6 class="card-title">${escapeHtml(f.news_articles?.title ?? "")}</h6>
             <a
               href="/pages/news-details.html?id=${f.news_articles?.id}"
-              class="btn btn-dark btn-sm mt-auto"
-            >Read</a>
+              class="btn btn-read-more mt-auto"
+            ><i data-lucide="book-open" class="icon-inline"></i> Read</a>
           </div>
         </div>
       </div>
       `
     )
     .join("");
+
+  if (window.lucide) window.lucide.createIcons();
 }
 
 // ─── Helper ───────────────────────────────────────────────────────────────────

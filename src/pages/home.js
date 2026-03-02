@@ -29,6 +29,7 @@ const categoryFilters = document.getElementById("categoryFilters");
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
 initNavbar();
+if (window.lucide) window.lucide.createIcons();
 await loadCategories();
 loadNews();
 
@@ -52,9 +53,9 @@ async function loadCategories() {
   const { data: categories } = await fetchCategories();
   if (!categories) return;
 
-  const allBtn = `<button class="btn btn-dark btn-sm active" data-category="all">All</button>`;
+  const allBtn = `<button class="category-pill active" data-category="all">All</button>`;
   const catBtns = categories
-    .map((c) => `<button class="btn btn-outline-dark btn-sm" data-category="${c.id}">${escapeHtml(c.name)}</button>`)
+    .map((c) => `<button class="category-pill" data-category="${c.id}">${escapeHtml(c.name)}</button>`)
     .join("");
 
   categoryFilters.innerHTML = allBtn + catBtns;
@@ -63,11 +64,9 @@ async function loadCategories() {
   categoryFilters.querySelectorAll("button[data-category]").forEach((btn) => {
     btn.addEventListener("click", () => {
       categoryFilters.querySelectorAll("button").forEach((b) => {
-        b.classList.remove("btn-dark", "active");
-        b.classList.add("btn-outline-dark");
+        b.classList.remove("active");
       });
-      btn.classList.remove("btn-outline-dark");
-      btn.classList.add("btn-dark", "active");
+      btn.classList.add("active");
 
       state.selectedCategory = btn.dataset.category;
       state.currentPage = 1;
@@ -82,7 +81,13 @@ async function loadCategories() {
  * Fetch news from the service and render cards + pagination.
  */
 async function loadNews() {
-  newsGrid.innerHTML = `<div class="col-12 text-center text-muted">Loading news...</div>`;
+  newsGrid.innerHTML = `
+    <div class="col-12 loading-spinner">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading…</span>
+      </div>
+      <span>Loading news…</span>
+    </div>`;
   pagination.innerHTML = "";
 
   const { data: articles, count, error } = await fetchApprovedNews({
@@ -109,41 +114,47 @@ async function loadNews() {
  */
 function renderNewsCards(articles) {
   if (!articles || articles.length === 0) {
-    newsGrid.innerHTML = `<div class="col-12 text-center text-muted">No news articles found.</div>`;
+    newsGrid.innerHTML = `<div class="col-12 text-center text-muted py-5"><i data-lucide="inbox" style="width:48px;height:48px;" class="mb-3 d-block mx-auto opacity-50"></i>No news articles found.</div>`;
+    if (window.lucide) window.lucide.createIcons();
     return;
   }
 
   newsGrid.innerHTML = articles
     .map(
-      (article) => `
+      (article, index) => `
         <div class="col-sm-6 col-lg-4">
-          <div class="card h-100 shadow-sm">
-            <img
-              src="${article.image_url || "https://placehold.co/600x300?text=No+Image"}"
-              class="card-img-top"
-              alt="${escapeHtml(article.title)}"
-              style="height: 200px; object-fit: cover;"
-            />
+          <div class="card h-100 card-animated" style="animation-delay: ${index * 0.07}s;">
+            <div style="overflow:hidden;">
+              <img
+                src="${article.image_url || "https://placehold.co/600x300?text=No+Image"}"
+                class="card-img-top"
+                alt="${escapeHtml(article.title)}"
+                style="height: 200px; object-fit: cover;"
+              />
+            </div>
             <div class="card-body d-flex flex-column">
-              <span class="badge bg-secondary mb-2">${escapeHtml(article.categories?.name ?? "")}</span>
+              <span class="badge badge-category mb-2" style="align-self:flex-start;">${escapeHtml(article.categories?.name ?? "")}</span>
               <h5 class="card-title">${escapeHtml(article.title)}</h5>
-              ${article.profiles?.username ? `<p class="text-muted small mb-1">by ${escapeHtml(article.profiles.username)}</p>` : ""}
-              <div class="d-flex justify-content-between align-items-center text-muted small mt-auto">
-                <span title="Likes">&#9829; ${article.article_likes?.[0]?.count ?? 0}</span>
-                <span title="Views">&#128065; ${article.article_views?.[0]?.count ?? 0}</span>
-                <span>${formatDate(article.created_at)}</span>
-                <span title="Comments">&#128172; ${article.comments?.[0]?.count ?? 0}</span>
+              ${article.profiles?.username ? `<p class="text-muted small mb-1"><i data-lucide="pen-tool" class="icon-sm"></i> ${escapeHtml(article.profiles.username)}</p>` : ""}
+              <div class="card-stats mt-auto">
+                <span title="Likes"><i data-lucide="heart" class="icon-sm"></i> ${article.article_likes?.[0]?.count ?? 0}</span>
+                <span title="Views"><i data-lucide="eye" class="icon-sm"></i> ${article.article_views?.[0]?.count ?? 0}</span>
+                <span title="Date"><i data-lucide="calendar" class="icon-sm"></i> ${formatDate(article.created_at)}</span>
+                <span title="Comments"><i data-lucide="message-circle" class="icon-sm"></i> ${article.comments?.[0]?.count ?? 0}</span>
               </div>
               <a
                 href="/pages/news-details.html?id=${article.id}"
-                class="btn btn-dark btn-sm mt-2"
-              >Read More</a>
+                class="btn btn-read-more mt-3"
+              >Read More <i data-lucide="arrow-right"></i></a>
             </div>
           </div>
         </div>
       `
     )
     .join("");
+
+  // Render Lucide icons inside dynamically created cards
+  if (window.lucide) window.lucide.createIcons();
 }
 
 /**

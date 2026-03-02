@@ -7,12 +7,18 @@
 import { requireRole } from "../utils/auth.js";
 import { fetchNewsById, updateNews } from "../services/newsService.js";
 
+// Initialize Lucide icons
+if (window.lucide) window.lucide.createIcons();
+
 const errorMessage = document.getElementById("errorMessage");
 const successMessage = document.getElementById("successMessage");
 const form = document.getElementById("editNewsForm");
 
 // Guard: only admin / editor
 await requireRole(["admin", "editor"]);
+
+// Initialize Lucide icons
+if (window.lucide) window.lucide.createIcons();
 
 const params = new URLSearchParams(window.location.search);
 const newsId = params.get("id");

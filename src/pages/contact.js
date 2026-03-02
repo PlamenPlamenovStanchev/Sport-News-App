@@ -4,9 +4,13 @@
 // Inserts the form data into the contact_messages table in Supabase.
 
 import { supabase } from "../services/supabaseClient.js";
+import { showToast } from "../utils/toast.js";
 
 const form = document.getElementById("contactForm");
 const successMessage = document.getElementById("successMessage");
+
+// Initialize Lucide icons on page load
+if (window.lucide) window.lucide.createIcons();
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -25,10 +29,11 @@ form.addEventListener("submit", async (e) => {
     .insert([{ name, email, subject, message }]);
 
   if (error) {
-    alert("Failed to send message: " + error.message);
+    showToast("Failed to send message: " + error.message, "error");
     return;
   }
 
+  showToast("Application submitted successfully!", "success");
   successMessage.textContent =
     "Thanks for your application! We'll review it and get back to you soon.";
   successMessage.classList.remove("d-none");

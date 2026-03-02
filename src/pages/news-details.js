@@ -5,6 +5,7 @@
 
 import { fetchNewsById, fetchCommentsByArticle, postComment, toggleArticleLike, countArticleLikes, hasUserLiked, toggleArticleFavourite, hasUserFavourited, recordArticleView } from "../services/newsService.js";
 import { getCurrentUser } from "../utils/auth.js";
+import { showToast } from "../utils/toast.js";
 
 // ─── Read ID from URL ─────────────────────────────────────────────────────────
 
@@ -38,16 +39,17 @@ async function loadArticle() {
   const container = document.getElementById("newsContent");
 
   if (error || !article) {
-    container.innerHTML = `<p class="text-danger">Article not found.</p>`;
+    container.innerHTML = `<p class="text-danger"><i data-lucide="alert-circle" class="icon-inline"></i> Article not found.</p>`;
+    if (window.lucide) window.lucide.createIcons();
     return;
   }
 
   document.title = `${article.title} | Sport News App`;
 
   container.innerHTML = `
-    <span class="badge bg-secondary mb-2">${article.sport_tag}</span>
+    <span class="badge badge-category mb-2">${article.sport_tag}</span>
     <h1 class="mb-3">${escapeHtml(article.title)}</h1>
-    <p class="text-muted small">Published on ${formatDate(article.created_at)}</p>
+    <p class="text-muted small"><i data-lucide="calendar" class="icon-sm"></i> Published on ${formatDate(article.created_at)}</p>
     ${
       article.image_url
         ? `<img src="${article.image_url}" class="img-fluid rounded mb-4" alt="${escapeHtml(article.title)}" />`
@@ -64,6 +66,8 @@ async function loadArticle() {
     document.getElementById("authorName").textContent = authorName;
     section.classList.remove("d-none");
   }
+
+  if (window.lucide) window.lucide.createIcons();
 }
 
 // ─── Comments ─────────────────────────────────────────────────────────────────
@@ -86,16 +90,19 @@ async function loadComments() {
   list.innerHTML = comments
     .map(
       (c) => `
-      <div class="border rounded p-3 mb-2">
+      <div class="comment-card">
         <p class="mb-1">${escapeHtml(c.content)}</p>
         <small class="text-muted">
-          by <strong>${c.profiles?.username ?? "Unknown"}</strong> &middot;
+          <i data-lucide="user" class="icon-sm"></i>
+          <strong>${c.profiles?.username ?? "Unknown"}</strong> &middot;
           ${formatDate(c.created_at)}
         </small>
       </div>
     `
     )
     .join("");
+
+  if (window.lucide) window.lucide.createIcons();
 }
 
 // ─── Like Button ──────────────────────────────────────────────────────────────
@@ -132,14 +139,16 @@ async function initLikeButton(user) {
 
 function updateLikeBtn(btn, liked) {
   if (liked) {
-    btn.innerHTML = "&#9829; Liked";
+    btn.innerHTML = '<i data-lucide="heart" class="icon-inline"></i> Liked';
     btn.classList.remove("btn-outline-danger");
-    btn.classList.add("btn-danger");
+    btn.classList.add("btn-danger", "btn-like-pulse");
+    setTimeout(() => btn.classList.remove("btn-like-pulse"), 350);
   } else {
-    btn.innerHTML = "&#9825; Like";
+    btn.innerHTML = '<i data-lucide="heart" class="icon-inline"></i> Like';
     btn.classList.remove("btn-danger");
     btn.classList.add("btn-outline-danger");
   }
+  if (window.lucide) window.lucide.createIcons({ nodes: [btn] });
 }
 
 // ─── Favourite Button ──────────────────────────────────────────────────────────
@@ -168,14 +177,15 @@ async function initFavouriteButton(user) {
 
 function updateFavBtn(btn, favourited) {
   if (favourited) {
-    btn.innerHTML = "&#9733; Favourited";
+    btn.innerHTML = '<i data-lucide="bookmark" class="icon-inline"></i> Favourited';
     btn.classList.remove("btn-outline-warning");
     btn.classList.add("btn-warning");
   } else {
-    btn.innerHTML = "&#9734; Favourite";
+    btn.innerHTML = '<i data-lucide="bookmark" class="icon-inline"></i> Favourite';
     btn.classList.remove("btn-warning");
     btn.classList.add("btn-outline-warning");
   }
+  if (window.lucide) window.lucide.createIcons({ nodes: [btn] });
 }
 
 // ─── Comment Form ─────────────────────────────────────────────────────────────
@@ -208,7 +218,7 @@ function handleCommentForm(user) {
     });
 
     if (error) {
-      alert("Failed to post comment: " + error.message);
+      showToast("Failed to post comment: " + error.message, "error");
       return;
     }
 

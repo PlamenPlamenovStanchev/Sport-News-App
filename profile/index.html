@@ -48,7 +48,7 @@
           <!-- Avatar placeholder -->
           <div
             id="profileAvatar"
-            class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center fs-2 fw-bold flex-shrink-0"
+            class="rounded-circle profile-avatar d-flex align-items-center justify-content-center fs-2 fw-bold flex-shrink-0"
             style="width: 72px; height: 72px;"
           >
             ?
@@ -65,7 +65,7 @@
               class="btn btn-warning btn-sm d-none"
               href="/pages/admin.html"
             >
-              Admin Panel
+              <i data-lucide="shield" class="icon-inline"></i> Admin Panel
             </a>
             <!-- Visible only to authors/admins (toggled by profile.js) -->
             <button
@@ -74,23 +74,23 @@
               data-bs-toggle="modal"
               data-bs-target="#createNewsModal"
             >
-              + Add News
+              <i data-lucide="plus" class="icon-inline"></i> Add News
             </button>
             <button id="logoutBtn" class="btn btn-outline-dark btn-sm">
-              Logout
+              <i data-lucide="log-out" class="icon-inline"></i> Logout
             </button>
           </div>
         </div>
 
         <!-- Comment & Like Counters -->
-        <div id="commentCounterSection" class="mb-4">
+        <div id="commentCounterSection" class="mb-4 d-flex gap-4">
           <p class="text-muted mb-0">
-            Total comments written:
-            <strong id="commentCount">0</strong>
+            <i data-lucide="message-circle" class="icon-inline"></i>
+            Comments: <strong id="commentCount">0</strong>
           </p>
           <p class="text-muted mb-0">
-            Total likes given:
-            <strong id="likeCount">0</strong>
+            <i data-lucide="heart" class="icon-inline"></i>
+            Likes: <strong id="likeCount">0</strong>
           </p>
         </div>
 
@@ -200,6 +200,7 @@
       <p class="mb-0">&copy; 2026 Sport News App. All rights reserved.</p>
     </footer>
 
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     ></script>

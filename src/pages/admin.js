@@ -22,6 +22,7 @@ import {
   fetchContactMessages,
   deleteContactMessage,
 } from "../services/adminService.js";
+import { showToast } from "../utils/toast.js";
 
 // ─── Auth Guard ───────────────────────────────────────────────────────────────
 await requireRole(["admin"]);
@@ -30,6 +31,9 @@ const currentUser = await getCurrentUser();
 // Reveal content
 document.getElementById("adminLoading").classList.add("d-none");
 document.getElementById("adminContent").classList.remove("d-none");
+
+// Initialize Lucide icons
+if (window.lucide) window.lucide.createIcons();
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let categoriesCache = [];
@@ -55,7 +59,7 @@ tabButtons.forEach((btn) => {
 loadTab(activeTab);
 
 function loadTab(tab) {
-  tabContent.innerHTML = `<p class="text-muted">Loading…</p>`;
+  tabContent.innerHTML = `<div class="loading-spinner"><div class="spinner-border" role="status"><span class="visually-hidden">Loading…</span></div><span>Loading…</span></div>`;
   if (tab === "news") loadNewsTab();
   else if (tab === "users") loadUsersTab();
   else if (tab === "messages") loadMessagesTab();
@@ -141,7 +145,8 @@ async function loadNewsTab() {
       btn.disabled = true;
       btn.textContent = "…";
       const { error } = await approveArticle(btn.dataset.id);
-      if (error) { alert("Approve failed: " + error.message); btn.disabled = false; btn.textContent = "Approve"; return; }
+      if (error) { showToast("Approve failed: " + error.message, "error"); btn.disabled = false; btn.textContent = "Approve"; return; }
+      showToast("Article approved!", "success");
       loadNewsTab();
     });
   });
@@ -178,7 +183,8 @@ async function loadNewsTab() {
       if (!ok) return;
       btn.disabled = true;
       const { error } = await deleteNews(btn.dataset.id);
-      if (error) { alert("Delete failed: " + error.message); btn.disabled = false; return; }
+      if (error) { showToast("Delete failed: " + error.message, "error"); btn.disabled = false; return; }
+      showToast("Article deleted.", "info");
       document.getElementById(`article-row-${btn.dataset.id}`)?.remove();
     });
   });
@@ -405,7 +411,8 @@ async function loadUsersTab() {
       if (!ok) return;
       btn.disabled = true;
       const { error } = await deleteUserData(btn.dataset.id);
-      if (error) { alert("Delete failed: " + error.message); btn.disabled = false; return; }
+      if (error) { showToast("Delete failed: " + error.message, "error"); btn.disabled = false; return; }
+      showToast("User deleted.", "info");
       document.getElementById(`user-row-${btn.dataset.id}`)?.remove();
     });
   });
@@ -622,13 +629,14 @@ async function loadMessagesTab() {
 
   tabContent.querySelectorAll(".delete-msg-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      const ok = await confirmDialog("Delete this message?");
+      const ok = await showConfirm({ title: "Delete Message", body: "Delete this message?", okLabel: "Delete", okClass: "btn-danger" });
       if (!ok) return;
       const { error: delErr } = await deleteContactMessage(btn.dataset.id);
       if (delErr) {
-        alert("Delete failed: " + delErr.message);
+        showToast("Delete failed: " + delErr.message, "error");
         return;
       }
+      showToast("Message deleted.", "info");
       loadMessagesTab();
     });
   });

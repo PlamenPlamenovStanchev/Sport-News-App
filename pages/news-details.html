@@ -15,24 +15,29 @@
     <nav class="navbar navbar-dark bg-dark">
       <div class="container d-flex">
         <a class="navbar-brand fw-bold" href="/index.html">SportNews</a>
-        <a href="/index.html" class="btn btn-outline-light btn-sm ms-auto my-auto">Back to Home</a>
+        <a href="/index.html" class="btn btn-outline-light btn-sm ms-auto my-auto"><i data-lucide="arrow-left" class="icon-inline"></i> Back to Home</a>
       </div>
     </nav>
 
     <main class="container my-4 my-md-5 article-container">
       <!-- News content injected by news-details.js -->
       <div id="newsContent">
-        <p class="text-muted text-center">Loading article...</p>
+        <div class="loading-spinner">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading…</span>
+          </div>
+          <span>Loading article…</span>
+        </div>
       </div>
 
       <!-- Like & Favourite Section -->
       <div id="likeSection" class="d-flex align-items-center gap-3 mt-4 mb-2">
         <button id="likeBtn" class="btn btn-outline-danger btn-sm d-none" title="Like this article">
-          &#9825; Like
+          <i data-lucide="heart" class="icon-inline"></i> Like
         </button>
         <span class="text-muted small"><span id="likeCount">0</span> likes</span>
         <button id="favBtn" class="btn btn-outline-warning btn-sm d-none" title="Add to Favourites">
-          &#9734; Favourite
+          <i data-lucide="bookmark" class="icon-inline"></i> Favourite
         </button>
       </div>
 
@@ -63,7 +68,7 @@
         <div class="d-flex align-items-center gap-3">
           <div
             id="authorAvatar"
-            class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center fs-4 fw-bold flex-shrink-0"
+            class="rounded-circle profile-avatar d-flex align-items-center justify-content-center fs-4 fw-bold flex-shrink-0"
             style="width: 56px; height: 56px;"
           >?</div>
           <div>
@@ -74,6 +79,7 @@
       </section>
     </main>
 
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     ></script>

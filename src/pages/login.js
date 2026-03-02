@@ -5,6 +5,9 @@
 import { supabase } from "../services/supabaseClient.js";
 import { getCurrentUser } from "../utils/auth.js";
 
+// Initialize Lucide icons
+if (window.lucide) window.lucide.createIcons();
+
 // Redirect to home if already logged in
 getCurrentUser().then((user) => {
   if (user) window.location.href = "/index.html";

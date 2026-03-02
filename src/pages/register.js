@@ -4,6 +4,9 @@
 
 import { supabase } from "../services/supabaseClient.js";
 
+// Initialize Lucide icons
+if (window.lucide) window.lucide.createIcons();
+
 const form = document.getElementById("registerForm");
 const errorMessage = document.getElementById("errorMessage");
 const successMessage = document.getElementById("successMessage");
