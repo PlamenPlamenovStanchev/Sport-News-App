@@ -87,3 +87,138 @@ img {
   user-select: none;
   -webkit-user-drag: none;
 }
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+
+/* --- Small screens (< 576px) ---------------------------------------- */
+
+@media (max-width: 575.98px) {
+  /* Tame the hero so it doesn't dominate the viewport */
+  .hero-title {
+    font-size: 1.75rem;
+  }
+  .hero-subtitle {
+    font-size: 0.95rem;
+  }
+
+  /* Category filter pills: horizontal scroll without wrapping off-screen */
+  #categoryFilters {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
+  }
+  #categoryFilters::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Profile header: stack vertically on mobile */
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+  .profile-header .profile-actions {
+    margin-left: 0 !important;
+    width: 100%;
+    justify-content: stretch;
+  }
+  .profile-header .profile-actions .btn {
+    flex: 1;
+  }
+
+  /* Full-width buttons on small screens */
+  .btn-mobile-full {
+    width: 100% !important;
+  }
+
+  /* Reduce card image height on small screens */
+  .card-img-top {
+    height: 160px !important;
+  }
+
+  /* Tighten spacing on admin tabs */
+  #adminTabs .nav-link {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  /* Article content: tighter line-height */
+  .article-body {
+    font-size: 0.95rem;
+    line-height: 1.65;
+  }
+
+  /* Like/fav section: wrap gracefully */
+  #likeSection {
+    flex-wrap: wrap;
+  }
+
+  /* Tables in admin: force horizontal scroll */
+  .admin-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-table-wrap table {
+    min-width: 600px;
+  }
+}
+
+/* --- Medium screens (576px – 767px) ---------------------------------- */
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+  .profile-header .profile-actions {
+    margin-left: 0 !important;
+  }
+
+  #categoryFilters {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* --- Large screens (≥ 992px) ----------------------------------------- */
+
+@media (min-width: 992px) {
+  /* Widen article detail pages for comfortable reading */
+  .article-container {
+    max-width: 820px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* ── Utility classes ──────────────────────────────────────────────────── */
+
+/* Horizontal scroll container (reusable) */
+.scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-x::-webkit-scrollbar {
+  height: 4px;
+}
+.scroll-x::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+/* Admin table wrapper */
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+/* Ensure text doesn't overflow card footers */
+.card .small {
+  word-break: break-word;
+}
