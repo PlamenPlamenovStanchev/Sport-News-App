@@ -284,6 +284,11 @@ export async function fetchCommentsByArticle(articleId) {
  * @returns {Promise<{ data: object|null, error: object|null }>}
  */
 export async function postComment({ article_id, user_id, content }) {
+  const profileError = await ensureProfileForComment(user_id);
+  if (profileError) {
+    return { data: null, error: profileError };
+  }
+
   const { data, error } = await supabase
     .from("comments")
     .insert([{ article_id, user_id, content }])
@@ -291,6 +296,22 @@ export async function postComment({ article_id, user_id, content }) {
     .single();
 
   return { data, error };
+}
+
+async function ensureProfileForComment(userId) {
+  const { data: existingProfile, error: selectError } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (selectError) return selectError;
+  if (existingProfile) return null;
+
+  const { error: ensureError } = await supabase.rpc("ensure_current_user_profile");
+  if (ensureError) return ensureError;
+
+  return null;
 }
 
 /**

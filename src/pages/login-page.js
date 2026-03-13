@@ -116,7 +116,13 @@ registerForm.addEventListener("submit", async (e) => {
   registerError.classList.add("d-none");
   registerSuccess.classList.add("d-none");
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { username },
+    },
+  });
 
   if (error) {
     setLoading(registerBtn, false, "Create Account");
@@ -125,13 +131,10 @@ registerForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  if (data.user) {
-    const { error: profileError } = await supabase.from("profiles").insert([
-      { id: data.user.id, username, role: "user" },
-    ]);
-    if (profileError) {
-      console.error("Profile creation error:", profileError.message);
-    }
+  if (!data.user) {
+    registerError.textContent = "Account could not be created. Please try again.";
+    registerError.classList.remove("d-none");
+    return;
   }
 
   setLoading(registerBtn, false, "Create Account");

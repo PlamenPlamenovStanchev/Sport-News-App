@@ -48,30 +48,6 @@ async function handleCallback() {
     return;
   }
 
-  const user = session.user;
-
-  // Ensure a profiles row exists (Google sign-in may be a first-time user).
-  const { data: existingProfile } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (!existingProfile) {
-    const rawName   = user.user_metadata?.full_name ?? user.email.split("@")[0];
-    const username  = rawName.replace(/\s+/g, "").toLowerCase();
-    const avatarUrl = user.user_metadata?.avatar_url ?? null;
-
-    const { error: profileError } = await supabase.from("profiles").insert([
-      { id: user.id, username, role: "user", avatar_url: avatarUrl },
-    ]);
-
-    if (profileError) {
-      // Non-fatal: the DB trigger may have already created it.
-      console.warn("Profile upsert skipped:", profileError.message);
-    }
-  }
-
   window.location.replace("/profile/");
 }
 

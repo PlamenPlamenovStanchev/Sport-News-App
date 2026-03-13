@@ -23,7 +23,13 @@ form.addEventListener("submit", async (e) => {
   successMessage.classList.add("d-none");
 
   // 1. Sign up with Supabase Auth
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { username },
+    },
+  });
 
   if (error) {
     errorMessage.textContent = error.message;
@@ -31,20 +37,10 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  // 2. Insert profile row (trigger in DB may handle this automatically)
-  //    Only attempt if user was created and confirmed.
-  if (data.user) {
-    const { error: profileError } = await supabase.from("profiles").insert([
-      {
-        id: data.user.id,
-        username,
-        role: "user",
-      },
-    ]);
-
-    if (profileError) {
-      console.error("Profile creation error:", profileError.message);
-    }
+  if (!data.user) {
+    errorMessage.textContent = "Account could not be created. Please try again.";
+    errorMessage.classList.remove("d-none");
+    return;
   }
 
   successMessage.textContent = "Account created! Check your email to confirm your account.";
